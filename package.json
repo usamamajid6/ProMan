@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/usamamajid6/ProMan/issues"
   },
-  "homepage": "https://github.com/usamamajid6/ProMan#readme"
+  "homepage": "https://github.com/usamamajid6/ProMan#readme",
+  "dependencies": {
+    "bcrypt": "^4.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.2",
+    "nodemon": "^2.0.2"
+  }
 }
