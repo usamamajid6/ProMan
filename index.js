@@ -1,16 +1,24 @@
 const express = require('express');
 const app = express();
 const PORT = 2222 || process.env.PORT;
-const UserSchema=require('./Schemas/UserSchema');
 const {connectToDB} = require('./connectToDB.js');
+const User = require('./Routes/UserRoutes');
 
 connectToDB();
 
 app.get('/', (req, res) => {
     test();
-    
-    res.send('Hello World');
-})
+});
+
+//<------------------User------------------>
+app.post('/registerUser',User);
+app.post('/loginUser',User);
+app.post('/getUser',User);
+app.get('/getAllUsers',User);
+app.put('/updateUser',User);
+app.post('/test',User);
+
+//<----------------End User---------------->
 
 app.listen(PORT, (e) => {
     console.log(`Server started at Port # ${PORT}`);

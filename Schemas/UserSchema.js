@@ -11,11 +11,11 @@ const UserSchema = new mongoose.Schema({
     },
     total_tasks: {
         type: Number,
-        default: 1
+        default: 0
     },
     efficiency_score: {
         type: Number,
-        default: 1
+        default: 0
     }
 });
 
