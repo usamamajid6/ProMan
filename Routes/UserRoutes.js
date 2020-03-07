@@ -8,7 +8,7 @@ app.post('/registerUser', async(req, res)=> {
         const uniqueEmailResult=await User.isEmailUnique(req.body.email);
         if(!uniqueEmailResult){
             try {
-                const result=await User.registerUser(req.body.name,req.body.email,req.body.password);
+                const result=await User.registerUser(req.body.name,req.body.email,req.body.password,req.body.phone_number);
             if(result){
                 res.json({
                     status:"Success",
@@ -160,9 +160,67 @@ app.post('/getUser',async(req,res)=>{
     }
 });
 
+app.post('/addProject',async(req,res)=>{
+    try {
+        const result = await User.addProject(req.body._id,req.body.project_id);
+        if(result){
+            //Add Project Successfully
+            res.json({
+                status:"Success",
+                message:"Add Project Succesfully!",
+                data:result
+            });
+        }else{
+            //Add Project Unsuccessful
+            res.json({
+                status:"Failed",
+                message:"Adding Project to User Unsuccesful!",
+                data:result
+            });
+        }
+    } catch (e) {
+        console.log("Problem in /addProject Route",e);
+        res.json({
+            status:"Failed",
+            message:"Some Problem in /addProject Router!",
+            data:e
+        })
+    }
+});
+
+app.put('/updateTTAES',async(req,res)=>{
+    try {
+        const result = await User.updateTTAES(req.body._id,req.body.efficiency_score);
+        if(result){
+            //Total Tasks And Efficiency Score Successfully
+            res.json({
+                status:"Success",
+                message:"Total Tasks And Efficiency Score Succesfully!",
+                data:result
+            });
+        }else{
+            //Total Tasks And Efficiency Score Unsuccessful
+            res.json({
+                status:"Failed",
+                message:"Adding Project to User Unsuccesful!",
+                data:result
+            });
+        }
+    } catch (e) {
+        console.log("Problem in /updateTTAES  updateTotalTasksAndEfficiencyScore Route",e);
+        res.json({
+            status:"Failed",
+            message:"Some Problem in /updateTTAES  updateTotalTasksAndEfficiencyScore Router!",
+            data:e
+        })
+    }
+});
+
 app.post('/test',async(req,res)=>{
     await User.isEmailUnique(req.body.email);
     res.send("/test");
 })
+
+
 
 module.exports=app;

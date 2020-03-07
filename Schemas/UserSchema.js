@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
     _id: {
-        type: Number
+        type: Number,
+        default:1
     },
     name: String,
     password: String,
+    phone_number:String,
     email: {
         type:String,
         lowercase:true
@@ -16,10 +18,17 @@ const UserSchema = new mongoose.Schema({
     efficiency_score: {
         type: Number,
         default: 0
-    }
+    },
+    projects:[
+        {
+            type:Number,
+            ref:'Project'
+        }
+        
+    ]
 });
 
 
 
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("User", UserSchema,'users');

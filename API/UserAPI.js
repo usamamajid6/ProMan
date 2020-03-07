@@ -23,17 +23,19 @@ const getLastId=async()=>{
     }
 }
 
-const registerUser=async (name,email,password)=>{
+const registerUser=async (name,email,password,phone_number)=>{
     try {
         let _id=await getLastId();
         _id=parseInt(_id);
         ++_id; 
+        // let _id=1;
         password=await bcrypt.hash(password, 10);
         const user = new User({
             _id,
             name,
             email,
-            password
+            password,
+            phone_number
         });
         try {
             const result=await User.create(user);
@@ -109,4 +111,32 @@ const getAllUsers=async()=>{
         return e;
     }
 }
-module.exports={registerUser,loginUser,isEmailUnique,getUser,updateUser,getAllUsers};
+
+const addProject=async (_id,project_id)=>{
+    try {
+        const result = await User.updateOne({_id},{$push:{projects:project_id}});
+        return result;
+    } catch (e) {
+        console.log("Problem in getAllUsers",e);
+        return e;
+    }
+}
+//updateTotalTasksAndEfficiencyScore
+const updateTTAES=async(_id,efficiency_score)=>{
+    try {
+        _id = parseInt(_id);
+        efficiency_score = parseInt(efficiency_score);
+        const result = await User.updateOne(
+            {_id},
+            {
+                $inc:{efficiency_score,total_tasks:1}
+            }
+        );
+        return result;
+    } catch (e) {
+        console.log("Problem in getAllUsers",e);
+        return e;
+    }
+}
+
+module.exports={registerUser,loginUser,isEmailUnique,getUser,updateUser,getAllUsers,addProject,updateTTAES};
