@@ -22,6 +22,10 @@ const TaskSchema = new mongoose.Schema({
     due_date: {
         type: Date
     },
+    status:{
+        type:String,
+        default:"in-progress"
+    },
     attachments: [
         {
             type: Number,

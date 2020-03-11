@@ -4,7 +4,11 @@ const CommentSchema = new mongoose.Schema({
         type: Number,
         default:1
     },
-    message: String
+    message: String,
+    member:{
+        type:Number,
+        ref:'User'
+    }
 });
 
 

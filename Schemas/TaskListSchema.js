@@ -4,6 +4,7 @@ const TaskListSchema = new mongoose.Schema({
         type: Number,
         default:1
     },
+    name:String,
     project: {
         type: Number,
         default: 0,
@@ -13,8 +14,7 @@ const TaskListSchema = new mongoose.Schema({
         {
             type:Number,
             ref:'Task'
-        }
-        
+        }    
     ]
 });
 

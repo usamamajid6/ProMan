@@ -139,4 +139,13 @@ const updateTTAES=async(_id,efficiency_score)=>{
     }
 }
 
-module.exports={registerUser,loginUser,isEmailUnique,getUser,updateUser,getAllUsers,addProject,updateTTAES};
+module.exports={
+    registerUser,
+    loginUser,
+    isEmailUnique,
+    getUser,
+    updateUser,
+    getAllUsers,
+    addProject,
+    updateTTAES
+};

@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const Project = require('../API/ProjectAPI');
-app.use(express.json());
+// app.use(express.json());
 
 app.post('/createNewProject', async(req, res)=> {
     try {

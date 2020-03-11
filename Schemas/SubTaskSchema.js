@@ -5,10 +5,15 @@ const SubTaskSchema = new mongoose.Schema({
         default:1
     },
     name: String,
-    task: {
+    description:String,
+    status: {
+        type:String,
+        default:"in-progress"
+    },
+    member:{
         type:Number,
-        ref:'Task',
-        default:0
+        default:0,
+        ref:'User'
     }
 });
 

@@ -45,6 +45,7 @@ const createNewProject=async(name,start_date,end_date,project_type,leader_id,sta
 const getProjectById=async(_id)=>{
     try {
         const result=await Project.findOne({_id:parseInt(_id)}).populate('leader');
+        // const result= await Project.find();
         return result;
     } catch (e) {
         console.log("Problem in Getting Project By Id",e);
@@ -73,7 +74,7 @@ const updateProjectStatus=async(_id,status)=>{
         );
         return result;
     } catch (e) {
-        console.log("Problem in Updating Leader",e);
+        console.log("Problem in Updating Project Status",e);
         return e;
     }
 }
@@ -86,7 +87,7 @@ const updateProjectType=async(_id,project_type)=>{
         );
         return result;
     } catch (e) {
-        console.log("Problem in Updating Leader",e);
+        console.log("Problem in Updating Project Type",e);
         return e;
     }
 }

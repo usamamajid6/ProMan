@@ -5,7 +5,11 @@ const AttachmentSchema = new mongoose.Schema({
         default:1
     },
     name: String,
-    path: String
+    path: String,
+    member:{
+        type:Number,
+        ref:'User'
+    }
 });
 
 

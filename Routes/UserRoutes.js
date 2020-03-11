@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const User = require('../API/UserAPI');
-app.use(express.json());
+// app.use(express.json());
 
 app.post('/registerUser', async(req, res)=> {
     try {

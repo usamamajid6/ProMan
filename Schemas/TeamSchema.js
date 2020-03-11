@@ -6,16 +6,15 @@ const TeamSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        default: "",
-        required: true
+        default: ""
+    },
+    description:{
+        type: String,
+        default: ""
     },
     leader: {
         type: Number,
         ref: 'User'
-    },
-    project: {
-        type: Number,
-        ref: 'Project'
     },
     members: [
         {

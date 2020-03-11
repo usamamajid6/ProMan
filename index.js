@@ -4,6 +4,13 @@ const PORT = 2222 || process.env.PORT;
 const { connectToDB } = require("./connectToDB.js");
 const User = require("./Routes/UserRoutes");
 const Project = require("./Routes/ProjectRoutes");
+const Attachment=require("./Routes/AttachmentRoutes");
+const Comment=require("./Routes/CommentRoutes");
+const SubTask=require("./Routes/SubTaskRoutes");
+const TaskList=require("./Routes/TaskListRoutes");
+const Task=require("./Routes/TaskRoutes");
+
+app.use(express.json());
 
 connectToDB();
 
@@ -31,7 +38,32 @@ app.put("/updateProjectType", Project);
 app.put("/updateProjectCost", Project);
 //<---------------End Project-------------->
 ////////////////////////////////////////////
-
+//<---------------Attachment--------------->
+app.post("/createNewAttachment",Attachment);
+app.post("/getAttachmentById",Attachment);
+//<-------------End Attachment------------->
+////////////////////////////////////////////
+//<----------------Comment----------------->
+app.post("/createNewComment",Comment);
+app.post("/getCommentById",Comment);
+//<--------------End Comment--------------->
+////////////////////////////////////////////
+//<----------------SubTask----------------->
+app.post("/createNewSubTask",SubTask);
+app.post("/getSubTaskById",SubTask);
+//<--------------End SubTask--------------->
+////////////////////////////////////////////
+//<---------------TaskList----------------->
+app.post("/createNewTaskList",TaskList);
+app.post("/getTaskListById",TaskList);
+//<-------------End TaskList--------------->
+////////////////////////////////////////////
+//<-----------------Task------------------->
+app.post("/createNewTask",Task);
+app.post("/getTaskById",Task);
+app.put("/updateTaskStatus", Task);
+//<---------------End Task----------------->
+////////////////////////////////////////////
 app.listen(PORT, e => {
   console.log(`Server started at Port # ${PORT}`);
 });
