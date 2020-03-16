@@ -9,6 +9,9 @@ const Comment=require("./Routes/CommentRoutes");
 const SubTask=require("./Routes/SubTaskRoutes");
 const TaskList=require("./Routes/TaskListRoutes");
 const Task=require("./Routes/TaskRoutes");
+const Team=require("./Routes/TeamRoutes");
+const Timeline=require("./Routes/TimelineRoutes");
+
 
 app.use(express.json());
 
@@ -63,6 +66,16 @@ app.post("/createNewTask",Task);
 app.post("/getTaskById",Task);
 app.put("/updateTaskStatus", Task);
 //<---------------End Task----------------->
+////////////////////////////////////////////
+//<-----------------Team------------------->
+app.post("/createNewTeam",Team);
+app.post("/getTeamById",Team);
+//<---------------End Team----------------->
+////////////////////////////////////////////
+//<---------------Timeline----------------->
+app.post("/createNewTimeline",Timeline);
+app.post("/getTimelineById",Timeline);
+//<-------------End Timeline--------------->
 ////////////////////////////////////////////
 app.listen(PORT, e => {
   console.log(`Server started at Port # ${PORT}`);

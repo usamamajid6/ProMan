@@ -11,12 +11,16 @@ const isEmailUnique=async(email)=>{
     }
 }
 
-const getLastId=async()=>{
+const getLastId = async () => {
     try {
-        const result = await User.find()
+        const result = await Timeline.find()
             .sort({ _id: -1 })
             .limit(1);
-        return result[0]._id;
+        if(result.length===0){
+            return 0;
+        }else{
+            return result[0]._id;
+        }
     } catch (e) {
         console.log("Error while getting last Last ID.", e);
         return e;

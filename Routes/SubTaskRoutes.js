@@ -37,38 +37,38 @@ app.post('/createNewSubTask', async(req, res)=> {
 
 
 
-app.post('/createNewSubTaskAndAddToTask', async(req, res)=> {
-    try {
-        const result= await SubTask.createNewSubTask(
-            req.body.name,
-            req.body.path,
-            req.body.member_id
-        );
+// app.post('/createNewSubTaskAndAddToTask', async(req, res)=> {
+//     try {
+//         const result= await SubTask.createNewSubTask(
+//             req.body.name,
+//             req.body.path,
+//             req.body.member_id
+//         );
      
-        if(result){
-            //Success in Creating New SubTask
-            res.json({
-             status:"Success",
-             message:"SubTask Created Succesfully!",
-             data:result
-         })
-        }else{
-            //Failed in Creating New SubTask
-            res.json({
-             status:"Failed",
-             message:"Unable to Create the SubTask!",
-             data:result
-         })
-        }
-     } catch (e) {
-         console.log("Problem in /createNewSubTask Router",e);
-         res.json({
-             status:"Failed",
-             message:"Some Problem in /createNewSubTask Router!",
-             data:e
-         })
-     }  
-});
+//         if(result){
+//             //Success in Creating New SubTask
+//             res.json({
+//              status:"Success",
+//              message:"SubTask Created Succesfully!",
+//              data:result
+//          })
+//         }else{
+//             //Failed in Creating New SubTask
+//             res.json({
+//              status:"Failed",
+//              message:"Unable to Create the SubTask!",
+//              data:result
+//          })
+//         }
+//      } catch (e) {
+//          console.log("Problem in /createNewSubTask Router",e);
+//          res.json({
+//              status:"Failed",
+//              message:"Some Problem in /createNewSubTask Router!",
+//              data:e
+//          })
+//      }  
+// });
 
 app.post('/getSubTaskById',async(req,res)=>{
     try {

@@ -8,7 +8,7 @@ const TeamSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    description:{
+    description: {
         type: String,
         default: ""
     },
@@ -16,20 +16,11 @@ const TeamSchema = new mongoose.Schema({
         type: Number,
         ref: 'User'
     },
-    members: [
+    members:
+    [
         {
-           member:{
-               type:Number,
-               ref:'User'
-           },
-           total_tasks:{
-               type:Number,
-               default:0
-           },
-           efficiency_score:{
-            type:Number,
-            default:0
-           }
+            type: Number,
+            ref: 'User'
         }
     ]
 });
