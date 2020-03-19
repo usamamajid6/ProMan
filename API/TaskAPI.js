@@ -3,7 +3,7 @@ const bcrypt=require('bcrypt');
 
 const getLastId = async () => {
     try {
-        const result = await Timeline.find()
+        const result = await Task.find()
             .sort({ _id: -1 })
             .limit(1);
         if(result.length===0){
@@ -74,6 +74,26 @@ const updateTaskStatus=async(_id,status)=>{
     }
 }
 
+const addAttachment=async(_id,attachment_id)=>{
+    try {
+        const result = await Task.updateOne({_id},{$push:{attachments:attachment_id}});
+        return result;
+    } catch (e) {
+        console.log("Problem in addAttachment",e);
+        return e;
+    }
+}
+
+const addComment = async (_id, comment_id) => {
+    try {
+        const result = await Task.updateOne({ _id }, { $push: { comments: comment_id } });
+        return result;
+    } catch (e) {
+        console.log("Problem in addComment", e);
+        return e;
+    }
+}
+
 // const addMember=async (_id,project_id)=>{
 //     try {
 //         const result = await User.updateOne({_id},{$push:{projects:project_id}});
@@ -97,5 +117,7 @@ const updateTaskStatus=async(_id,status)=>{
 module.exports={
     createNewTask,
     getTaskById,
-    updateTaskStatus
+    updateTaskStatus,
+    addAttachment,
+    addComment
 };

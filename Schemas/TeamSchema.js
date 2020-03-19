@@ -22,6 +22,13 @@ const TeamSchema = new mongoose.Schema({
             type: Number,
             ref: 'User'
         }
+    ],
+    projects:
+    [
+        {
+            type: Number,
+            ref: 'Project'
+        }
     ]
 });
 

@@ -2,18 +2,21 @@ const mongoose = require("mongoose");
 const ProjectSchema = new mongoose.Schema({
     _id: {
         type: Number,
-        default:1
+        default: 1
     },
     name: String,
-    start_date:Date,
-    end_date:Date,
-    project_type:String,
-    leader:{
-        type:Number,
-        ref:'User'
+    start_date: Date,
+    end_date: Date,
+    project_type: String,
+    leader: {
+        type: Number,
+        ref: 'User'
     },
     members: [
         {
+            _id: {
+                type: Number
+            },
             member: {
                 type: Number,
                 ref: 'User'
@@ -28,21 +31,21 @@ const ProjectSchema = new mongoose.Schema({
             }
         }
     ],
-    status:{
-        type:String,
-        default:""
+    status: {
+        type: String,
+        default: "in-progress"
     },
-    cost:{
-        type:String,
-        default:""
+    cost: {
+        type: String,
+        default: "Sorry No Information Provided"
     },
-    timeline:[
+    timelines: [
         {
-            type:Number,
-            ref:'Timeline',
-            default:0
+            type: Number,
+            ref: 'Timeline',
+            default: 0
         }
     ]
 });
 
-module.exports = mongoose.model("Project", ProjectSchema,'projects');
+module.exports = mongoose.model("Project", ProjectSchema, 'projects');

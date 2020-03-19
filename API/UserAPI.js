@@ -13,7 +13,7 @@ const isEmailUnique=async(email)=>{
 
 const getLastId = async () => {
     try {
-        const result = await Timeline.find()
+        const result = await User.find()
             .sort({ _id: -1 })
             .limit(1);
         if(result.length===0){

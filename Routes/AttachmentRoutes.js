@@ -1,103 +1,133 @@
 const express = require('express')
 const app = express()
 const Attachment = require('../API/AttachmentAPI');
+const Task = require('../API/TaskAPI');
 
-app.post('/createNewAttachment', async(req, res)=> {
+
+//This route create a new attachment and add this attachment_id to attachments field in Task
+app.post('/createNewAttachment', async (req, res) => {
     try {
-       const result= await Attachment.createNewAttachment(
-           req.body.name,
-           req.body.path,
-           req.body.member_id
-       );
-    
-       if(result){
-           //Success in Creating New Attachment
-           res.json({
-            status:"Success",
-            message:"Attachment Created Succesfully!",
-            data:result
-        })
-       }else{
-           //Failed in Creating New Attachment
-           res.json({
-            status:"Failed",
-            message:"Unable to Create the Attachment!",
-            data:result
-        })
-       }
-    } catch (e) {
-        console.log("Problem in /createNewAttachment Router",e);
-        res.json({
-            status:"Failed",
-            message:"Some Problem in /createNewAttachment Router!",
-            data:e
-        })
-    }   
-});
-
-
-
-app.post('/createNewAttachmentAndAddToTask', async(req, res)=> {
-    try {
-        const result= await Attachment.createNewAttachment(
+        const result = await Attachment.createNewAttachment(
             req.body.name,
             req.body.path,
             req.body.member_id
         );
-     
-        if(result){
+
+        if (result) {
             //Success in Creating New Attachment
-            res.json({
-             status:"Success",
-             message:"Attachment Created Succesfully!",
-             data:result
-         })
-        }else{
+            try {
+                const secondResult = await Task.addAttachment(req.body.task_id, result._id);
+                if (secondResult) {
+                    //Success in Adding New Attachment To Task
+                    res.json({
+                        status: "Success",
+                        message: "Attachment Created Succesfully!",
+                        data: {
+                            result,
+                            secondResult
+                        }
+                    })
+                } else {
+                    //Failed in Adding New Attachment To Task
+                    res.json({
+                        status: "Failed",
+                        message: "Attachment Created Succesfully But Attachment Not added to Tasks!",
+                        data: result
+                    })
+                }
+            } catch (e) {
+                console.log("Problem in /createNewAttachment Router", e);
+                res.json({
+                    status: "Failed",
+                    message: "Some Problem in /createNewAttachment Router!",
+                    data: e
+                })
+            }
+
+        } else {
             //Failed in Creating New Attachment
             res.json({
-             status:"Failed",
-             message:"Unable to Create the Attachment!",
-             data:result
-         })
+                status: "Failed",
+                message: "Unable to Create the Attachment!",
+                data: result
+            })
         }
-     } catch (e) {
-         console.log("Problem in /createNewAttachment Router",e);
-         res.json({
-             status:"Failed",
-             message:"Some Problem in /createNewAttachment Router!",
-             data:e
-         })
-     }  
+    } catch (e) {
+        console.log("Problem in /createNewAttachment Router", e);
+        res.json({
+            status: "Failed",
+            message: "Some Problem in /createNewAttachment Router!",
+            data: e
+        })
+    }
 });
 
-app.post('/getAttachmentById',async(req,res)=>{
+
+//No need for folowing route
+app.post('/createNewAttachmentAndAddToTask', async (req, res) => {
+    try {
+        const result = await Attachment.createNewAttachment(
+            req.body.name,
+            req.body.path,
+            req.body.member_id
+        );
+
+        if (result) {
+            //Success in Creating New Attachment
+            res.json({
+                status: "Success",
+                message: "Attachment Created Succesfully!",
+                data: result
+            })
+        } else {
+            //Failed in Creating New Attachment
+            res.json({
+                status: "Failed",
+                message: "Unable to Create the Attachment!",
+                data: result
+            })
+        }
+    } catch (e) {
+        console.log("Problem in /createNewAttachment Router", e);
+        res.json({
+            status: "Failed",
+            message: "Some Problem in /createNewAttachment Router!",
+            data: e
+        })
+    }
+});
+
+
+//This route returns single attachement 
+
+app.post('/getAttachmentById', async (req, res) => {
     try {
         const result = await Attachment.getAttachmentById(req.body._id);
-        if(result){
+        if (result) {
             //Get Attachment Successfully
             res.json({
-                status:"Success",
-                message:"Get Attachment Succesfully!",
-                data:result
+                status: "Success",
+                message: "Get Attachment Succesfully!",
+                data: result
             });
-        }else{
+        } else {
             //Get Attachment Unsuccessful
             res.json({
-                status:"Failed",
-                message:"Attachment Not Found!",
-                data:result
+                status: "Failed",
+                message: "Attachment Not Found!",
+                data: result
             });
         }
     } catch (e) {
-        console.log("Problem in /getAttachmentById Route",e);
+        console.log("Problem in /getAttachmentById Route", e);
         res.json({
-            status:"Failed",
-            message:"Some Problem in /getAttachmentById Router!",
-            data:e
+            status: "Failed",
+            message: "Some Problem in /getAttachmentById Router!",
+            data: e
         })
     }
 });
 
 
 
-module.exports=app;
+module.exports = app;

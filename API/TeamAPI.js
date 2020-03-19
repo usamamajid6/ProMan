@@ -3,12 +3,12 @@ const Team = require('../Schemas/TeamSchema');
 
 const getLastId = async () => {
     try {
-        const result = await Timeline.find()
+        const result = await Team.find()
             .sort({ _id: -1 })
             .limit(1);
-        if(result.length===0){
+        if (result.length === 0) {
             return 0;
-        }else{
+        } else {
             return result[0]._id;
         }
     } catch (e) {
@@ -19,11 +19,11 @@ const getLastId = async () => {
 
 const createNewTeam = async (name, description, leader_id) => {
     try {
-        let _id= await getLastId();
+        let _id = await getLastId();
         _id = parseInt(_id);
         ++_id;
         // let _id = 1;
-        
+
         const team = new Team({
             _id,
             name,
@@ -55,9 +55,26 @@ const getTeamById = async (_id) => {
     }
 }
 
-const addMember = () => {
-
+const addProject = async (_id, project_id) => {
+    try {
+        const result = await Team.updateOne({ _id }, { $push: { projects: project_id } });
+        return result;
+    } catch (e) {
+        console.log("Problem in addProject", e);
+        return e;
+    }
 }
+
+const addMember = async (_id, member_id) => {
+    try {
+        const result = await Team.updateOne({ _id }, { $push: { members: member_id } });
+        return result;
+    } catch (e) {
+        console.log("Problem in addMember", e);
+        return e;
+    }
+}
+
 
 
 //update Efficiency Score and Total Tasks Of Member(ESATTOM)
@@ -65,4 +82,4 @@ const updateESATTOM = () => {
 
 }
 
-module.exports = { createNewTeam, getTeamById, addMember, updateESATTOM };
+module.exports = { createNewTeam, getTeamById, addMember, updateESATTOM, addProject };
