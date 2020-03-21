@@ -32,7 +32,10 @@ app.post('/createNewAttachment', async (req, res) => {
                     res.json({
                         status: "Failed",
                         message: "Attachment Created Succesfully But Attachment Not added to Tasks!",
-                        data: result
+                        data: {
+                            result,
+                            secondResult
+                        }
                     })
                 }
             } catch (e) {

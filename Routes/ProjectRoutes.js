@@ -26,14 +26,20 @@ app.post('/createNewProject', async (req, res) => {
                         res.json({
                             status: "Success",
                             message: "Project Created Succesfully!",
-                            data: result
+                            data: {
+                                result,
+                                secondResult
+                            }
                         })
                     } else {
                         //Failed in Adding New Project To Team
                         res.json({
                             status: "Failed",
                             message: "Project Created Succesfully But Project Not added to Teams!",
-                            data: result
+                            data: {
+                                result,
+                                secondResult
+                            }
                         })
                     }
                 } catch (e) {

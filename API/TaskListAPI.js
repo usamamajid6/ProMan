@@ -7,9 +7,9 @@ const getLastId = async () => {
         const result = await TaskList.find()
             .sort({ _id: -1 })
             .limit(1);
-        if(result.length===0){
+        if (result.length === 0) {
             return 0;
-        }else{
+        } else {
             return result[0]._id;
         }
     } catch (e) {
@@ -23,7 +23,6 @@ const createNewTaskList = async (name, project_id) => {
         let _id = await getLastId();
         _id = parseInt(_id);
         ++_id;
-        // let _id=1;
         const taskList = new TaskList({
             _id,
             name,
@@ -43,10 +42,12 @@ const createNewTaskList = async (name, project_id) => {
     }
 }
 
-const getTaskListById = async (_id) => {
+const getTaskListById = async _id => {
     try {
 
-        const taskList = TaskList.findOne({ _id: parseInt(_id) }).populate('member');
+        const taskList = TaskList.findOne({ _id: parseInt(_id) })
+        .populate('project')
+        .populate('tasks');
         return taskList;
     } catch (e) {
         console.log("Problem in getTaskListById.", e);
@@ -54,4 +55,18 @@ const getTaskListById = async (_id) => {
     }
 }
 
-module.exports = { createNewTaskList, getTaskListById };
+const addTask = async (_id, task_id) => {
+    try {
+        const result = await Task.updateOne({ _id }, { $push: { tasks: task_id } });
+        return result;
+    } catch (e) {
+        console.log("Problem in addTask", e);
+        return e;
+    }
+}
+
+module.exports = {
+    createNewTaskList,
+    getTaskListById,
+    addTask
+};

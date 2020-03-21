@@ -7,7 +7,7 @@ app.post('/createNewTask', async(req, res)=> {
        const result= await Task.createNewTask(
            req.body.name,
            req.body.description,
-           req.body.pre_req,
+           req.body.pre_req_id,
            req.body.due_date,
            req.body.member_id_array
        );
@@ -38,7 +38,7 @@ app.post('/createNewTask', async(req, res)=> {
 });
 
 
-
+// No need for that
 app.post('/createNewTaskAndAddToTaskList', async(req, res)=> {
     try {
         const result= await Task.createNewTask(

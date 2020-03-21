@@ -31,7 +31,10 @@ app.post('/createNewComment', async (req, res) => {
                     res.json({
                         status: "Failed",
                         message: "Comment Created Succesfully But Comment Not added to Tasks!",
-                        data: result
+                        data: {
+                            result,
+                            secondResult
+                        }
                     })
                 }
             } catch (e) {
