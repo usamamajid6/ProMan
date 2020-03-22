@@ -19,14 +19,20 @@ app.post('/createNewTimeline', async (req, res) => {
                     res.json({
                         status: "Success",
                         message: "Timeline Created Succesfully!",
-                        data: result
+                        data: {
+                            result,
+                            secondResult
+                        }
                     })
                 } else {
                     //Failed in Adding Timeline To Project
                     res.json({
                         status: "Failed",
                         message: "Failed in Adding Timeline To Project",
-                        data: result
+                        data: {
+                            result,
+                            secondResult
+                        }
                     })
                 }
             } catch (error) {

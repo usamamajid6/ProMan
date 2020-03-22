@@ -1,7 +1,7 @@
 const User = require('../Schemas/UserSchema');
-const bcrypt=require('bcrypt');
+const bcrypt = require('bcrypt');
 
-const isEmailUnique=async(email)=>{
+const isEmailUnique = async (email) => {
     try {
         const result = await User.findOne({ email });
         return result;
@@ -16,9 +16,9 @@ const getLastId = async () => {
         const result = await User.find()
             .sort({ _id: -1 })
             .limit(1);
-        if(result.length===0){
+        if (result.length === 0) {
             return 0;
-        }else{
+        } else {
             return result[0]._id;
         }
     } catch (e) {
@@ -27,13 +27,13 @@ const getLastId = async () => {
     }
 }
 
-const registerUser=async (name,email,password,phone_number)=>{
+const registerUser = async (name, email, password, phone_number) => {
     try {
-        let _id=await getLastId();
-        _id=parseInt(_id);
-        ++_id; 
+        let _id = await getLastId();
+        _id = parseInt(_id);
+        ++_id;
         // let _id=1;
-        password=await bcrypt.hash(password, 10);
+        password = await bcrypt.hash(password, 10);
         const user = new User({
             _id,
             name,
@@ -42,108 +42,115 @@ const registerUser=async (name,email,password,phone_number)=>{
             phone_number
         });
         try {
-            const result=await User.create(user);
+            const result = await User.create(user);
             return result;
         } catch (e) {
-            console.log("Problem in Adding New User.",e);
+            console.log("Problem in Adding New User.", e);
             return e;
         }
-        
+
     } catch (e) {
-        console.log("Problem in Getting Last Id for New User.",e);
-            return e;
+        console.log("Problem in Getting Last Id for New User.", e);
+        return e;
     }
 }
 
-const loginUser=async(email,password)=>{
+const loginUser = async (email, password) => {
     try {
-        const user=await User.findOne({email});
-        if(user){
+        const user = await User.findOne({ email });
+        if (user) {
             try {
                 //user email found
-                const hashPassword=user.password;
-                const comparePasswordResult=await bcrypt.compare(password,hashPassword);
-                if(comparePasswordResult){
+                const hashPassword = user.password;
+                const comparePasswordResult = await bcrypt.compare(password, hashPassword);
+                if (comparePasswordResult) {
                     //Password Matches
                     return user;
-                }else{
+                } else {
                     //Password didn't match
                     return comparePasswordResult;
                 }
-                
+
             } catch (e) {
-                console.log("Problem in Comparing Hash Password.",e);
+                console.log("Problem in Comparing Hash Password.", e);
                 return e;
             }
-        }else{
+        } else {
             //user email not exists
             return user;
         }
-        
+
     } catch (e) {
-        console.log("Problem in loginUser.",e);
+        console.log("Problem in loginUser.", e);
         return e;
     }
 }
 
-const getUser=async(_id)=>{
+const getUser = async (_id) => {
     try {
-        const user = await User.findOne({_id:parseInt(_id)});
+        const user = await User.findOne({ _id: parseInt(_id) });
         return user;
     } catch (e) {
-        console.log("Problem in getUser",e);
+        console.log("Problem in getUser", e);
         return e;
     }
 }
 
-const updateUser=async(_id,name)=>{
+const updateUser = async (_id, name, phone_number) => {
     try {
-        const user = await User.updateOne({_id},{name});
+        const user = await User.updateOne(
+            { _id },
+            {
+                name,
+                phone_number
+            }
+        );
         return user;
     } catch (e) {
-        console.log("Problem in updateUser",e);
+        console.log("Problem in updateUser", e);
         return e;
     }
 }
 
-const getAllUsers=async()=>{
+const getAllUsers = async () => {
     try {
         const users = await User.find();
         return users;
     } catch (e) {
-        console.log("Problem in getAllUsers",e);
+        console.log("Problem in getAllUsers", e);
         return e;
     }
 }
 
-const addProject=async (_id,project_id)=>{
+//No need for that method
+const addProject = async (_id, project_id) => {
     try {
-        const result = await User.updateOne({_id},{$push:{projects:project_id}});
+        const result = await User.updateOne({ _id }, { $push: { projects: project_id } });
         return result;
     } catch (e) {
-        console.log("Problem in getAllUsers",e);
+        console.log("Problem in getAllUsers", e);
         return e;
     }
 }
 //updateTotalTasksAndEfficiencyScore
-const updateTTAES=async(_id,efficiency_score)=>{
+const updateTTAES = async (_id, efficiency_score) => {
     try {
         _id = parseInt(_id);
         efficiency_score = parseInt(efficiency_score);
         const result = await User.updateOne(
-            {_id},
+            { _id },
             {
-                $inc:{efficiency_score,total_tasks:1}
+                $inc: { efficiency_score, total_tasks: 1 }
             }
         );
         return result;
     } catch (e) {
-        console.log("Problem in getAllUsers",e);
+        console.log("Problem in getAllUsers", e);
         return e;
     }
 }
 
-module.exports={
+module.exports = {
     registerUser,
     loginUser,
     isEmailUnique,

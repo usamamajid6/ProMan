@@ -47,7 +47,9 @@ const createNewTeam = async (name, description, leader_id) => {
 const getTeamById = async (_id) => {
     try {
 
-        const team = Team.findOne({ _id: parseInt(_id) }).populate('leader');
+        const team = Team.findOne({ _id: parseInt(_id) }).populate('leader')
+            .populate('projects')
+            .populate('members');
         return team;
     } catch (e) {
         console.log("Problem in getTeamById.", e);
@@ -82,4 +84,22 @@ const updateESATTOM = () => {
 
 }
 
-module.exports = { createNewTeam, getTeamById, addMember, updateESATTOM, addProject };
+
+const getTeamsByMemberId = async member_id => {
+    try {
+        const result = await Team.find({ members: member_id });
+        return result;
+    } catch (e) {
+        console.log("Problem in getTeamsByMemberId", e);
+        return e;
+    }
+}
+
+module.exports = {
+    createNewTeam,
+    getTeamById,
+    addMember,
+    updateESATTOM,
+    addProject,
+    getTeamsByMemberId
+};

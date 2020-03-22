@@ -18,14 +18,7 @@ const UserSchema = new mongoose.Schema({
     efficiency_score: {
         type: Number,
         default: 0
-    },
-    projects:[
-        {
-            type:Number,
-            ref:'Project'
-        }
-        
-    ]
+    }
 });
 
 

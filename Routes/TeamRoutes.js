@@ -66,4 +66,40 @@ app.post('/getTeamById',async(req,res)=>{
 
 
 
+app.put('/addMultipleMemberToTeam', async (req, res) => {
+
+
+    try {
+        let fullResult = "";
+        for (let i = 0; i < req.body.member_id.length; i++) {
+            let result = await Team.addMember(req.body._id, req.body.member_id[i]);
+            fullResult = JSON.stringify(fullResult) + result;
+        }
+        if (fullResult) {
+            //Adding member to Team Successfully
+            res.json({
+                status: "Success",
+                message: "Adding member to Team Succesfully!",
+                data: fullResult
+            });
+        } else {
+            //Adding member to Team Unsuccessful
+            res.json({
+                status: "Failed",
+                message: "Some problem occur!",
+                data: fullResult
+            });
+        }
+
+    } catch (e) {
+        console.log("Problem in /addMemberToTeam Route", e);
+        res.json({
+            status: "Failed",
+            message: "Some Problem in /addMemberToTeam Router!",
+            data: e
+        })
+    }
+});
+
+
 module.exports=app;

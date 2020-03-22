@@ -157,6 +157,16 @@ const updateTTAES = async (_id, member_id, efficiency_score) => {
 
 
 
+const getProjectsByMemberId = async member_id => {
+    try {
+        const result = await Project.find({ "members.member": member_id });
+        return result;
+    } catch (e) {
+        console.log("Problem in getProjectsByMemberId", e);
+        return e;
+    }
+}
+
 
 module.exports = {
     createNewProject,
@@ -167,5 +177,6 @@ module.exports = {
     updateProjectCost,
     addTimeline,
     addMember,
-    updateTTAES
+    updateTTAES,
+    getProjectsByMemberId
 };
