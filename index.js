@@ -24,8 +24,8 @@ app.use(Timeline);
 app.use(Team);
 app.use(Task);
 app.use(TaskList);
-app.use(SubTask),
-  app.use(Project);
+app.use(SubTask);
+app.use(Project);
 
 
 app.listen(PORT, e => {
