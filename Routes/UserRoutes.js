@@ -8,6 +8,10 @@ const Team = require('../API/TeamAPI');
 
 
 app.post('/registerUser', async (req, res) => {
+    console.log("--------------------");
+    console.log(req.body);
+    console.log("--------------------");
+    
     try {
         const uniqueEmailResult = await User.isEmailUnique(req.body.email);
         if (!uniqueEmailResult) {

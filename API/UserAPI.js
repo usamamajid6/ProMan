@@ -28,6 +28,9 @@ const getLastId = async () => {
 }
 
 const registerUser = async (name, email, password, phone_number) => {
+    console.log("------------------------------");
+    console.log(name);
+    console.log("------------------------------");
     try {
         let _id = await getLastId();
         _id = parseInt(_id);
