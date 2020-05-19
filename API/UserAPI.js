@@ -1,5 +1,5 @@
 const User = require('../Schemas/UserSchema');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const isEmailUnique = async (email) => {
     try {

@@ -1,5 +1,4 @@
 const Attachment = require('../Schemas/AttachmentSchema');
-const bcrypt = require('bcrypt');
 
 
 const getLastId = async () => {

@@ -1,6 +1,4 @@
 const TaskList = require('../Schemas/TaskListSchema');
-const bcrypt = require('bcrypt');
-
 
 const getLastId = async () => {
     try {

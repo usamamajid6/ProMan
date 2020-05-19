@@ -10,6 +10,9 @@ const AttachmentSchema = new mongoose.Schema({
         type:Number,
         ref:'User'
     }
+},{
+    
+    timestamps:true
 });
 
 

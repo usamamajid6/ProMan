@@ -1,7 +1,5 @@
 const SubTask = require('../Schemas/SubTaskSchema');
 
-const bcrypt = require('bcrypt');
-
 
 const getLastId = async () => {
     try {

@@ -1,5 +1,4 @@
 const Comment = require('../Schemas/CommentSchema');
-const bcrypt = require('bcrypt');
 
 const getLastId = async () => {
     try {
