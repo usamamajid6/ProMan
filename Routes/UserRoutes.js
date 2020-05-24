@@ -21,6 +21,7 @@ app.post('/registerUser', async (req, res) => {
                     req.body.email,
                     req.body.password,
                     req.body.phone_number
+                
                 );
                 if (result) {
                     res.json({
@@ -146,6 +147,143 @@ app.post('/loginUser', async (req, res) => {
         })
     }
 });
+
+
+
+app.post('/registerUserGoogleFB', async (req, res) => {
+    try {
+        const uniqueEmailResult = await User.isEmailUnique(req.body.email);
+        if (!uniqueEmailResult) {
+            try {
+                const result = await User.registerUserGoogleFB(
+                    req.body.name,
+                    req.body.email
+                );
+                if (result) {
+                    res.json({
+                        status: "Success",
+                        message: "User Registered Succesfully!",
+                        data: result
+                    });
+                } else {
+                    res.json({
+                        status: "Failed",
+                        message: "Some Problem Occur!",
+                        data: result
+                    });
+                }
+            } catch (e) {
+                console.log("Problem in /registerUserGoogleFB Router", e);
+                res.json({
+                    status: "Failed",
+                    message: "Some Problem in /registerUserGoogleFB Router!",
+                    data: e
+                })
+            }
+        } else {
+            res.json({
+                status: "Failed",
+                message: "Email Already Taken!",
+                data: {}
+            })
+        }
+
+    } catch (e) {
+        console.log("Problem in /registerUserGoogleFB Router", e);
+        res.json({
+            status: "Failed",
+            message: "Some Problem in /registerUserGoogleFB Router!",
+            data: e
+        })
+    }
+});
+
+app.post('/loginUserGoogleFB', async (req, res) => {
+    try {
+        const result = await User.loginUserGoogleFB(req.body.email);
+        if (result) {
+            //User Exists
+            try {
+                const secondResult = await Project.getProjectsByMemberId(result._id);
+                if (secondResult) {
+                    //Success in getting User Projects
+                    try {
+                        const thirdResult = await Team.getTeamsByMemberId(result._id);
+                        if (thirdResult) {
+                            //Success in getting User Teams
+                            res.json({
+                                status: "Success",
+                                message: "User Login Successfully!",
+                                data: {
+                                    result,
+                                    secondResult,
+                                    thirdResult
+                                }
+                            })
+                        } else {
+                            //Problem in getting User Projects
+                            res.json({
+                                status: "Failed",
+                                message: "Problem in getting User Teams!",
+                                data: {
+                                    result,
+                                    secondResult,
+                                    thirdResult
+                                }
+                            });
+                        }
+
+                    } catch (e) {
+                        console.log("Problem in /updateUser Route", e);
+                        res.json({
+                            status: "Failed",
+                            message: "Some Problem in /updateUser Router!",
+                            data: e
+                        })
+                    }
+                    res.json({
+                        status: "Success",
+                        message: "User Login Succesfully!",
+                        data: result
+                    });
+                } else {
+                    //Problem in getting User Projects
+                    res.json({
+                        status: "Failed",
+                        message: "Problem in getting User Projects!",
+                        data: {
+                            result,
+                            secondResult
+                        }
+                    });
+                }
+
+            } catch (e) {
+                console.log("Problem in /loginUserGoogleFB Route", e);
+                res.json({
+                    status: "Failed",
+                    message: "Some Problem in /loginUserGoogleFB Router!",
+                    data: e
+                })
+            }
+        } else {
+            //Credentials didn't match
+            res.json({
+                status: "Failed",
+                message: "Email incorrect!",
+                data: result
+            });
+        }
+    } catch (e) {
+        console.log("Problem in /loginUserGoogleFB Route", e);
+        res.json({
+            status: "Failed",
+            message: "Some Problem in /loginUserGoogleFB Router!",
+            data: e
+        })
+    }
+});
+
 
 app.put('/updateUser', async (req, res) => {
     try {
@@ -303,6 +441,7 @@ app.post('/test', async (req, res) => {
     await User.isEmailUnique(req.body.email);
     res.send("/test");
 })
+
 
 
 

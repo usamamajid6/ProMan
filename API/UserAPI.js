@@ -1,5 +1,6 @@
 const User = require('../Schemas/UserSchema');
 const bcrypt = require('bcryptjs');
+const generatePassword = require('password-generator');
 
 const isEmailUnique = async (email) => {
     try {
@@ -60,7 +61,7 @@ const registerUser = async (name, email, password, phone_number) => {
 
 const loginUser = async (email, password) => {
     try {
-        const user = await User.findOne({ email });
+        const user = await (await User.findOne({ email }));''
         if (user) {
             try {
                 //user email found
@@ -80,7 +81,7 @@ const loginUser = async (email, password) => {
             }
         } else {
             //user email not exists
-            return user;
+            return false;
         }
 
     } catch (e) {
@@ -153,6 +154,53 @@ const updateTTAES = async (_id, efficiency_score) => {
     }
 }
 
+
+const registerUserGoogleFB = async(name,email)=>{
+    try {
+        let _id = await getLastId();
+        _id = parseInt(_id);
+        ++_id;
+        password = await generatePassword(12, false);
+        password = await bcrypt.hash(password, 10);
+        const user = new User({
+            _id,
+            name,
+            email,
+            password
+        });
+        try {
+            const result = await User.create(user);
+            return result;
+        } catch (e) {
+            console.log("Problem in Adding New User By Google/FB.", e);
+            return e;
+        }
+
+    } catch (e) {
+        console.log("Problem in Getting Last Id for New User By Google/FB.", e);
+        return e;
+    }
+}
+
+
+
+const loginUserGoogleFB = async(email)=>{
+    try {
+        const user = await (await User.findOne({ email }));
+        if (user) {
+            return user;
+        } else {
+            //user email not exists
+            return false;
+        }
+
+    } catch (e) {
+        console.log("Problem in loginUser.", e);
+        return e;
+    }
+}
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -161,5 +209,7 @@ module.exports = {
     updateUser,
     getAllUsers,
     addProject,
-    updateTTAES
+    updateTTAES,
+    registerUserGoogleFB,
+    loginUserGoogleFB
 };
