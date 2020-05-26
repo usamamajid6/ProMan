@@ -29,6 +29,12 @@ app.use(TaskList);
 app.use(SubTask);
 app.use(Project);
 
+app.get('/',(req,res)=>{
+  res.json({
+    "Message":"Last Commit At 1:46PM At May 26"
+  })
+})
+
 
 app.listen(PORT, e => {
   console.log(`Server started at Port # ${PORT}`);
