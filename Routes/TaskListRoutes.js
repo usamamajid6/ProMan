@@ -34,7 +34,6 @@ app.post('/createNewTaskList', async(req, res)=> {
     }   
 });
 
-
 //No need for that
 app.post('/createNewTaskListAndAddToTask', async(req, res)=> {
     try {

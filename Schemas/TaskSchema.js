@@ -1,55 +1,60 @@
 const mongoose = require("mongoose");
 const TaskSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        default: 1
+  _id: {
+    type: Number,
+    default: 1,
+  },
+  name: {
+    type: String,
+    default: "",
+    required: true,
+  },
+  description: {
+    type: String,
+    default: "",
+    required: true,
+  },
+  pre_req: {
+    type: Number,
+    ref: "Task",
+    default: 0,
+  },
+  task_list: {
+    type: Number,
+    ref: "TaskList",
+    default: 0,
+  },
+  due_date: {
+    type: Date,
+  },
+  status: {
+    type: String,
+    default: "in-progress",
+  },
+  attachments: [
+    {
+      type: Number,
+      ref: "Attachment",
     },
-    name: {
-        type: String,
-        default: "",
-        required: true
+  ],
+  comments: [
+    {
+      type: Number,
+      ref: "Comment",
     },
-    description: {
-        type: String,
-        default: "",
-        required: true
+  ],
+  members: [
+    {
+      type: Number,
+      ref: "User",
     },
-    pre_req: {
-        type: Number,
-        ref: "Task",
-        default: 0
+  ],
+  sub_tasks: [
+    {
+      type: Number,
+      ref: "SubTask",
     },
-    due_date: {
-        type: Date
-    },
-    status:{
-        type:String,
-        default:"in-progress"
-    },
-    attachments: [
-        {
-            type: Number,
-            ref: "Attachment"
-        }
-    ],
-    comments: [
-        {
-            type: Number,
-            ref: "Comment"
-        }
-    ],
-    members: [
-        {
-            type: Number,
-            ref: "User"
-        }
-    ],
-    sub_tasks: [
-        {
-            type: Number,
-            ref: "SubTask"
-        }
-    ]
+  ],
 });
 
 module.exports = mongoose.model("Task", TaskSchema, "tasks");

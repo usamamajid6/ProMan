@@ -3,7 +3,7 @@ const app = express();
 const Project = require("../API/ProjectAPI");
 const Team = require("../API/TeamAPI");
 const User = require("../API/UserAPI");
-
+const TaskList = require("../API/TaskListAPI");
 // app.use(express.json());
 
 app.post("/createNewProject", async (req, res) => {
@@ -106,10 +106,12 @@ app.post("/getProjectById", async (req, res) => {
     const result = await Project.getProjectById(req.body._id);
     if (result) {
       //Get Project Successfully
+      const taskList = await TaskList.getTaskListsByProjectId(result._id);
+      // result.data.taskList = taskList;
       res.json({
         status: "Success",
         message: "Get Project Succesfully!",
-        data: result,
+        data: { result, taskList },
       });
     } else {
       //Get Project Unsuccessful
