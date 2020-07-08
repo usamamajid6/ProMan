@@ -66,24 +66,20 @@ app.post("/getTeamById", async (req, res) => {
 
 app.put("/addMultipleMemberToTeam", async (req, res) => {
   try {
-    let fullResult = "";
-    for (let i = 0; i < req.body.member_id.length; i++) {
-      let result = await Team.addMember(req.body._id, req.body.member_id[i]);
-      fullResult = JSON.stringify(fullResult) + result;
-    }
-    if (fullResult) {
+    let result = await Team.addMembers(req.body._id, req.body.member_id_array);
+    if (result) {
       //Adding member to Team Successfully
       res.json({
         status: "Success",
         message: "Adding member to Team Succesfully!",
-        data: fullResult,
+        data: result,
       });
     } else {
       //Adding member to Team Unsuccessful
       res.json({
         status: "Failed",
         message: "Some problem occur!",
-        data: fullResult,
+        data: result,
       });
     }
   } catch (e) {

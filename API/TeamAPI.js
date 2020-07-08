@@ -79,6 +79,35 @@ const addMember = async (_id, member_id) => {
   }
 };
 
+const ifPresent = (array, _id) => {
+  let found = false;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === _id) {
+      found = true;
+      break;
+    }
+  }
+  return found;
+};
+
+const addMembers = async (_id, member_id_array) => {
+  try {
+    const res = await Team.findById(_id);
+    let members = res.members;
+    for (let i = 0; i < member_id_array.length; i++) {
+      const element = member_id_array[i];
+      if (!ifPresent(members, element)) {
+        members.push(element);
+      }
+    }
+
+    const result = await Team.updateOne({ _id }, { members });
+    return result;
+  } catch (e) {
+    console.log("Problem in addMember", e);
+    return e;
+  }
+};
 //update Efficiency Score and Total Tasks Of Member(ESATTOM)
 const updateESATTOM = () => {};
 
@@ -96,6 +125,7 @@ module.exports = {
   createNewTeam,
   getTeamById,
   addMember,
+  addMembers,
   updateESATTOM,
   addProject,
   getTeamsByMemberId,

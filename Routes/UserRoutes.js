@@ -43,7 +43,7 @@ app.post("/registerUser", async (req, res) => {
         });
       }
     } else {
-      res.json({
+      res.status(201).json({
         status: "Failed",
         message: "Email Already Exists!",
         data: {},

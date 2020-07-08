@@ -126,6 +126,17 @@ const addTimeline = async (_id, timeline_id) => {
   }
 };
 
+const ifPresent = (array, _id) => {
+  let found = false;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i]._id === _id) {
+      found = true;
+      break;
+    }
+  }
+  return found;
+};
+
 const addMember = async (_id, member_id) => {
   try {
     const result = await Project.updateOne(
@@ -141,6 +152,33 @@ const addMember = async (_id, member_id) => {
         },
       }
     );
+    return result;
+  } catch (e) {
+    console.log("Problem in addMember", e);
+    return e;
+  }
+};
+
+const addMembers = async (_id, member_id_array) => {
+  try {
+    const res = await Project.findById(_id);
+    let members = res.members;
+
+    for (let i = 0; i < member_id_array.length; i++) {
+      const element = member_id_array[i];
+      if (!ifPresent(members, element._id)) {
+        let tempObj = {
+          _id: parseInt(element._id),
+          member: element._id,
+          total_tasks: 0,
+          efficiency_score: "0",
+        };
+
+        members.push(tempObj);
+      }
+    }
+
+    const result = await Project.updateOne({ _id }, { members });
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
@@ -185,6 +223,7 @@ module.exports = {
   updateProjectCost,
   addTimeline,
   addMember,
+  addMembers,
   updateTTAES,
   getProjectsByMemberId,
 };

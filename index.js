@@ -1,6 +1,10 @@
+const cors = require("cors");
 const express = require("express");
-const cors = require('cors');
+const http = require("http");
+const socketIo = require("socket.io");
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server); // < Interesting!
 const PORT = 2222 || process.env.PORT;
 const { connectToDB } = require("./connectToDB.js");
 const User = require("./Routes/UserRoutes");
@@ -12,7 +16,6 @@ const TaskList = require("./Routes/TaskListRoutes");
 const Task = require("./Routes/TaskRoutes");
 const Team = require("./Routes/TeamRoutes");
 const Timeline = require("./Routes/TimelineRoutes");
-
 
 app.use(express.json());
 app.use(cors());
@@ -28,15 +31,32 @@ app.use(Task);
 app.use(TaskList);
 app.use(SubTask);
 app.use(Project);
+io.on("connection", (socket) => {
+  socket.emit("fromServer", { data: "s" });
+  socket.on("joinTheProjectRoom", (data) => {
+    const room_name = "roomForProject#" + data._id;
 
-app.get('/',(req,res)=>{
+    socket.join(room_name);
+  });
+  socket.on("leaveTheProjectRoom", (data) => {
+    const room_name = "roomForProject#" + data._id;
+
+    socket.leave(room_name);
+  });
+  socket.on("tellRoomMatesToUpdateProject", (data) => {
+    const room_name = "roomForProject#" + data._id;
+    io.to(room_name).emit("updateProjectData");
+  });
+  socket.on("disconnect", () => console.log("Client disconnected"));
+});
+
+app.get("/", (req, res) => {
   res.json({
-    "Message":"Last Commit At 12:00 PM At June 29"
-  })
-})
+    Message: "Last Commit At 2:46 PM At July 8",
+  });
+});
 
-
-app.listen(PORT, e => {
+server.listen(PORT, (e) => {
   console.log(`Server started at Port # ${PORT}`);
 });
 
@@ -50,36 +70,84 @@ const test = async () => {
   console.log("----------------------Working!----------------------");
 };
 
+// let members = [
+//   {
+//     _id: 1,
+//     name: "Member A",
+//   },
+//   {
+//     _id: 2,
+//     name: "Member B",
+//   },
+//   {
+//     _id: 3,
+//     name: "Member C",
+//   },
+//   {
+//     _id: 4,
+//     name: "Member D",
+//   },
+// ];
 
+// let addMembers = [
+//   {
+//     _id: 5,
+//     name: "Member E",
+//   },
+//   {
+//     _id: 6,
+//     name: "Member F",
+//   },
+//   {
+//     _id: 3,
+//     name: "Member C",
+//   },
+//   {
+//     _id: 4,
+//     name: "Member D",
+//   },
+// ];
 
+// let newArray = [
+//   {
+//     _id: 1,
+//     name: "Member A",
+//   },
+//   {
+//     _id: 2,
+//     name: "Member B",
+//   },
+//   {
+//     _id: 3,
+//     name: "Member C",
+//   },
+//   {
+//     _id: 4,
+//     name: "Member D",
+//   },
+// ];
 
+// const ifPresent = (array, _id) => {
+//   let found = false;
+//   for (let i = 0; i < array.length; i++) {
+//     if (array[i]._id === _id) {
+//       found = true;
+//       break;
+//     }
+//   }
+//   return found;
+// };
 
+// for (let i = 0; i < addMembers.length; i++) {
+//   const element = addMembers[i];
+//   if (!ifPresent(newArray, element._id)) {
+//     newArray.push(element);
+//   }
+// }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// console.log("====================================");
+// console.log(newArray);
+// console.log("====================================");
 
 // //<------------------User------------------>
 // app.post("/registerUser", User);
@@ -142,3 +210,189 @@ const test = async () => {
 // app.post("/getTimelineById", Timeline);
 // //<-------------End Timeline--------------->
 // ////////////////////////////////////////////
+const result = [
+  {
+    project: 1,
+    tasks: [
+      {
+        _id: 6,
+        name: "Task 4",
+        description: "hg hgh hg hg",
+        pre_req: 0,
+        task_list: 1,
+        status: "in-progress",
+        attachments: [],
+        comments: [],
+        members: [1, 2],
+        sub_tasks: [],
+        due_date: "2020-07-06T19:00:00.000Z",
+        __v: 0,
+      },
+      {
+        _id: 7,
+        name: "Task 4",
+        description: "hg hgh hg hg",
+        pre_req: 0,
+        task_list: 1,
+        status: "in-progress",
+        attachments: [],
+        comments: [],
+        members: [1, 2],
+        sub_tasks: [],
+        due_date: "2020-07-06T19:00:00.000Z",
+        __v: 0,
+      },
+      {
+        _id: 8,
+        name: "Task 4",
+        description: "hg hgh hg hg",
+        pre_req: 0,
+        task_list: 1,
+        status: "in-progress",
+        attachments: [],
+        comments: [],
+        members: [1, 2],
+        sub_tasks: [],
+        due_date: "2020-07-06T19:00:00.000Z",
+        __v: 0,
+      },
+      {
+        _id: 9,
+        name: "Task 4",
+        description: "hg hgh hg hg",
+        pre_req: 0,
+        task_list: 1,
+        status: "in-progress",
+        attachments: [],
+        comments: [],
+        members: [1, 2],
+        sub_tasks: [],
+        due_date: "2020-07-06T19:00:00.000Z",
+        __v: 0,
+      },
+      {
+        _id: 10,
+        name: "Task 4",
+        description: "hg hgh hg hg",
+        pre_req: 0,
+        task_list: 1,
+        status: "in-progress",
+        attachments: [],
+        comments: [],
+        members: [1, 2],
+        sub_tasks: [],
+        due_date: "2020-07-06T19:00:00.000Z",
+        __v: 0,
+      },
+      {
+        _id: 11,
+        name: "Tean A",
+        description: "GFG YG ghas hgas hgja sdaugd djhgjsd sjhs saJHAS lsa",
+        pre_req: 0,
+        task_list: 1,
+        status: "in-progress",
+        attachments: [],
+        comments: [],
+        members: [1, 2, 3, 4],
+        sub_tasks: [],
+        due_date: "2020-07-06T19:00:00.000Z",
+        __v: 0,
+      },
+    ],
+    _id: 1,
+    name: "Task List",
+    __v: 0,
+  },
+  {
+    project: 1,
+    tasks: [],
+    _id: 2,
+    name: "Task List",
+    __v: 0,
+  },
+  {
+    project: 1,
+    tasks: [],
+    _id: 3,
+    name: "Task List",
+    __v: 0,
+  },
+  {
+    project: 1,
+    tasks: [],
+    _id: 4,
+    name: "Task List",
+    __v: 0,
+  },
+  {
+    project: 1,
+    tasks: [],
+    _id: 5,
+    name: "Task List",
+    __v: 0,
+  },
+];
+// let lanes = [];
+// for (let i = 0; i < result.length; i++) {
+//   let taskList = result[i];
+//   let tasks = taskList.tasks;
+//   taskList.tasks = [];
+//   lanes.push(taskList);
+//   for (let j = 0; j < tasks.length; j++) {
+//     let task = tasks[j];
+//     if (task.members.includes(1)) {
+//       task.draggable = true;
+//     } else {
+//       task.draggable = false;
+//     }
+//     // task.metadata = { attachments:task.attachments,comments:task.comments,members:task.members };
+//     task.metadata = { ...task };
+//     lanes[i].tasks.push(task);
+//   }
+//   lanes[i].cards = lanes[i].tasks;
+//   delete lanes[i].tasks;
+// }
+
+// console.log(lanes[0].cards[0]);
+
+// const filteredData = (result, user_id) => {
+//   let lanes = [];
+//   for (let i = 0; i < result.length; i++) {
+//     let taskList = result[i];
+//     let tasks = taskList.tasks;
+//     taskList.tasks = [];
+//     lanes.push(taskList);
+//     for (let j = 0; j < tasks.length; j++) {
+//       let task = tasks[j];
+//       if (task.members.includes(user_id)) {
+//         task.draggable = true;
+//       } else {
+//         task.draggable = false;
+//       }
+
+//       lanes[i].tasks.push(task);
+//     }
+//   }
+//   return lanes;
+// };
+
+// const list = result.map((project) => {
+//   const { tasks } = project;
+//   return {
+//     ...project,
+//     tasks: tasks.map((task) => {
+//       return {
+//         ...task,
+//         draggable: task.members.includes(1),
+//       };
+//     }),
+//   };
+// });
+
+// console.log("====================================");
+// console.log(list);
+// console.log("====================================");
+
+// module.exports = {
+//   filteredData,
+// };

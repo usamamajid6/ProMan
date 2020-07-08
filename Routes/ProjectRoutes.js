@@ -30,17 +30,28 @@ app.post("/createNewProject", async (req, res) => {
             //Success in Adding New Project To Team
             const thirdResult = await Team.getTeamById(req.body.team_id);
             const members = thirdResult.members;
-
-            let fullResult = "";
-            for (let i = 0; i < members.length; i++) {
-              let r = await Project.addMember(result._id, members[i]._id);
-              fullResult = JSON.stringify(fullResult) + res;
-            }
+            await Project.addMembers(result._id, members);
+            const r1 = await TaskList.createNewTaskList(
+              "In Progress",
+              result._id
+            );
+            const r2 = await TaskList.createNewTaskList("Pending", result._id);
+            const r3 = await TaskList.createNewTaskList("Done", result._id);
+            console.log("====================================");
+            console.log(r1);
+            console.log("====================================");
+            console.log("====================================");
+            console.log(r2);
+            console.log("====================================");
+            console.log("====================================");
+            console.log(r3);
+            console.log("====================================");
+            const updatedResult = await Project.getProjectById(result._id);
             res.json({
               status: "Success",
               message: "Project Created Succesfully!",
               data: {
-                result,
+                result: updatedResult,
               },
             });
           } else {
@@ -69,10 +80,11 @@ app.post("/createNewProject", async (req, res) => {
             parseInt(result._id),
             parseInt(req.body.leader_id)
           );
+          const updatedResult = await Project.getProjectById(result._id);
           res.json({
             status: "Success",
             message: "Project Created Succesfully!",
-            data: result,
+            data: { result: updatedResult },
           });
         } catch (error) {
           console.log("Problem in /createNewProject Router", e);
@@ -398,6 +410,44 @@ app.put("/addMultipleMemberToProject", async (req, res) => {
     res.json({
       status: "Failed",
       message: "Some Problem in /addMemberToProject Router!",
+      data: e,
+    });
+  }
+});
+
+app.post("/getProjectData", async (req, res) => {
+  // Body Parameters
+  // _id // Project ID
+  // user_id // ID of user who accessing it
+  try {
+    const result = await Project.getProjectById(req.body._id);
+
+    if (result) {
+      //Get Project Successfully
+      let taskList = await TaskList.getTaskListsByProjectId(
+        result._id,
+        req.body.user_id
+      );
+
+      result.taskList = taskList;
+      res.json({
+        status: "Success",
+        message: "Get Project Succesfully!",
+        data: { result, taskList },
+      });
+    } else {
+      //Get Project Unsuccessful
+      res.json({
+        status: "Failed",
+        message: "Project Not Found!",
+        data: result,
+      });
+    }
+  } catch (e) {
+    console.log("Problem in /getProjectById Route", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem in /getProjectById Router!",
       data: e,
     });
   }
