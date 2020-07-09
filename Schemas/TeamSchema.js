@@ -30,6 +30,9 @@ const TeamSchema = new mongoose.Schema({
             ref: 'Project'
         }
     ]
+},{
+    
+    timestamps:true
 });
 
 module.exports = mongoose.model("Team", TeamSchema, "teams");

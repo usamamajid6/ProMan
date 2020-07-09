@@ -17,6 +17,9 @@ const TaskListSchema = new mongoose.Schema({
       ref: "Task",
     },
   ],
+},{
+    
+  timestamps:true
 });
 
 module.exports = mongoose.model("TaskList", TaskListSchema, "tasklists");

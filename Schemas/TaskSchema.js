@@ -45,8 +45,13 @@ const TaskSchema = new mongoose.Schema({
   ],
   members: [
     {
-      type: Number,
-      ref: "User",
+      _id: Number,
+      member: {
+        type: Number,
+        ref: "User",
+      },
+      task_status: String,
+      last_updated_on: Date,
     },
   ],
   sub_tasks: [
@@ -55,6 +60,9 @@ const TaskSchema = new mongoose.Schema({
       ref: "SubTask",
     },
   ],
+},{
+    
+  timestamps:true
 });
 
 module.exports = mongoose.model("Task", TaskSchema, "tasks");

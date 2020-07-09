@@ -19,7 +19,21 @@ app.post("/createNewProject", async (req, res) => {
     );
     if (result) {
       //Success in Creating New Project
-
+      const r1 = await TaskList.createNewTaskList(
+        "In Progress",
+        result._id,
+        "All tasks with status of in-progress will appear here!"
+      );
+      const r2 = await TaskList.createNewTaskList(
+        "Pending",
+        result._id,
+        "All tasks with status of pending will appear here!"
+      );
+      const r3 = await TaskList.createNewTaskList(
+        "Done",
+        result._id,
+        "All tasks with status of done will appear here!"
+      );
       if (!(req.body.team_id === "no-team")) {
         try {
           const secondResult = await Team.addProject(
@@ -31,21 +45,7 @@ app.post("/createNewProject", async (req, res) => {
             const thirdResult = await Team.getTeamById(req.body.team_id);
             const members = thirdResult.members;
             await Project.addMembers(result._id, members);
-            const r1 = await TaskList.createNewTaskList(
-              "In Progress",
-              result._id
-            );
-            const r2 = await TaskList.createNewTaskList("Pending", result._id);
-            const r3 = await TaskList.createNewTaskList("Done", result._id);
-            console.log("====================================");
-            console.log(r1);
-            console.log("====================================");
-            console.log("====================================");
-            console.log(r2);
-            console.log("====================================");
-            console.log("====================================");
-            console.log(r3);
-            console.log("====================================");
+
             const updatedResult = await Project.getProjectById(result._id);
             res.json({
               status: "Success",

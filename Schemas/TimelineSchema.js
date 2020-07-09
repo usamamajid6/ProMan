@@ -4,6 +4,9 @@ const TimelineSchema = new mongoose.Schema({
         type: Number
     },
     content: String
+},{
+    
+    timestamps:true
 });
 
 

@@ -49,16 +49,45 @@ const getTaskListById = async (_id) => {
     return e;
   }
 };
+const ifPresent = (array, _id) => {
+  let found = false;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === _id) {
+      found = true;
+      break;
+    }
+  }
+  return found;
+};
 
 const addTask = async (_id, task_id) => {
   try {
-    const result = await TaskList.updateOne(
-      { _id },
-      { $push: { tasks: task_id } }
-    );
+    const res = await TaskList.findById(_id);
+    let tasks = res.tasks;
+    if (!ifPresent(tasks, task_id)) {
+      tasks.push(task_id);
+    }
+    const result = await TaskList.updateOne({ _id }, { tasks });
     return result;
   } catch (e) {
     console.log("Problem in addTask", e);
+    return e;
+  }
+};
+
+const removeTask = async (_id, task_id) => {
+  try {
+    const res = await TaskList.findById(_id);
+
+    let tasks = res.tasks;
+    const index = tasks.indexOf(task_id);
+    if (index > -1) {
+      tasks.splice(index, 1);
+    }
+    const result = await TaskList.updateOne({ _id }, { tasks });
+    return result;
+  } catch (e) {
+    console.log("Problem in removeTask", e);
     return e;
   }
 };
@@ -192,4 +221,5 @@ module.exports = {
   getTaskListById,
   addTask,
   getTaskListsByProjectId,
+  removeTask,
 };

@@ -70,6 +70,31 @@ const test = async () => {
   console.log("----------------------Working!----------------------");
 };
 
+var today = new Date();
+var Christmas = new Date("2020-07-10T08:15:34.316Z");
+console.log(Christmas);
+var diffMs;
+if (today > Christmas) {
+  diffMs = today - Christmas; // milliseconds between now & Christmas
+} else {
+  diffMs = Christmas - today; // milliseconds between now & Christmas
+}
+
+var diffDays = Math.floor(diffMs / 86400000); // days
+var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+let totalMins =
+  Math.abs(diffDays) * 24 * 60 + Math.abs(diffHrs) * 60 + Math.abs(diffMins);
+console.log(
+  diffDays +
+    " days, " +
+    diffHrs +
+    " hours, " +
+    diffMins +
+    " minutes until Christmas 2009 =)"
+);
+console.log("Total Minutes equals to ", totalMins);
+
 // let members = [
 //   {
 //     _id: 1,

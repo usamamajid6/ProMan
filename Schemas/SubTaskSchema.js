@@ -15,6 +15,9 @@ const SubTaskSchema = new mongoose.Schema({
         default:0,
         ref:'User'
     }
+},{
+    
+    timestamps:true
 });
 
 
