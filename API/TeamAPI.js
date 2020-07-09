@@ -113,7 +113,7 @@ const updateESATTOM = () => {};
 
 const getTeamsByMemberId = async (member_id) => {
   try {
-    const result = await Team.find({ members: member_id });
+    const result = await Team.find({ members: member_id }).populate("projects");
     return result;
   } catch (e) {
     console.log("Problem in getTeamsByMemberId", e);
