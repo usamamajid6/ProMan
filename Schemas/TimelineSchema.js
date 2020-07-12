@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
-const TimelineSchema = new mongoose.Schema({
+const TimelineSchema = new mongoose.Schema(
+  {
     _id: {
-        type: Number
+      type: Number,
     },
-    content: String
-},{
-    
-    timestamps:true
-});
+    content: String,
+    type: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
-
-
-
-module.exports = mongoose.model("Timeline", TimelineSchema,'timelines');
+module.exports = mongoose.model("Timeline", TimelineSchema, "timelines");

@@ -178,10 +178,10 @@ app.post("/getUserById", async (req, res) => {
               });
             }
           } catch (e) {
-            console.log("Problem in /updateUser Route", e);
+            console.log("Problem in /getUserById Route", e);
             res.json({
               status: "Failed",
-              message: "Some Problem in /updateUser Router!",
+              message: "Some Problem in /getUserById Router!",
               data: e,
             });
           }
@@ -202,10 +202,10 @@ app.post("/getUserById", async (req, res) => {
           });
         }
       } catch (e) {
-        console.log("Problem in /loginUser Route", e);
+        console.log("Problem in /getUserById Route", e);
         res.json({
           status: "Failed",
-          message: "Some Problem in /loginUser Router!",
+          message: "Some Problem in /getUserById Router!",
           data: e,
         });
       }
@@ -218,10 +218,10 @@ app.post("/getUserById", async (req, res) => {
       });
     }
   } catch (e) {
-    console.log("Problem in /loginUser Route", e);
+    console.log("Problem in /getUserById Route", e);
     res.json({
       status: "Failed",
-      message: "Some Problem in /loginUser Router!",
+      message: "Some Problem in /getUserById Router!",
       data: e,
     });
   }

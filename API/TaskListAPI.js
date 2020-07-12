@@ -1,5 +1,5 @@
 const TaskList = require("../Schemas/TaskListSchema");
-
+const TimelineAPI = require("./TimelineAPI");
 const getLastId = async () => {
   try {
     const result = await TaskList.find().sort({ _id: -1 }).limit(1);
@@ -27,6 +27,8 @@ const createNewTaskList = async (name, project_id, description) => {
     });
     try {
       const result = await TaskList.create(taskList);
+      let content = "New Task List " + name + " added to this project";
+      await TimelineAPI.createNewTimeline(content, "blue", project_id);
       return result;
     } catch (e) {
       console.log("Problem in Adding New TaskList.", e);
@@ -179,7 +181,8 @@ const getTaskListsByProjectId = async (project_id, user_id) => {
       path: "tasks",
       populate: [
         {
-          path: "members",
+          path: "members.member",
+          select: { name: 1 },
         },
         {
           path: "comments",

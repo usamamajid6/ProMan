@@ -1,4 +1,6 @@
 const Project = require("../Schemas/ProjectSchema");
+const UserAPI = require("./UserAPI");
+const TimelineAPI = require("./TimelineAPI");
 
 const getLastId = async () => {
   try {
@@ -42,6 +44,8 @@ const createNewProject = async (
     });
     try {
       const result = await Project.create(project);
+      let content = name + " project has been created!";
+      await TimelineAPI.createNewTimeline(content, "blue", result._id);
       return result;
     } catch (e) {
       console.log("Problem in Creating New Project!");
@@ -59,6 +63,7 @@ const getProjectById = async (_id) => {
       .populate("leader")
       .populate("timelines")
       .populate("members.member");
+    
     // const result= await Project.find();
     return result;
   } catch (e) {
@@ -73,6 +78,9 @@ const updateProjectLeader = async (_id, leader_id) => {
       { _id: parseInt(_id) },
       { leader: parseInt(leader_id) }
     );
+    const leader = await UserAPI.getUser(leader_id);
+    let content = "Leader is changed to " + leader.name;
+    await TimelineAPI.createNewTimeline(content, "gray", _id);
     return result;
   } catch (e) {
     console.log("Problem in Updating Leader", e);
@@ -83,6 +91,8 @@ const updateProjectLeader = async (_id, leader_id) => {
 const updateProjectStatus = async (_id, status) => {
   try {
     const result = await Project.updateOne({ _id: parseInt(_id) }, { status });
+    let content = "Status of project changed to " + status;
+    await TimelineAPI.createNewTimeline(content, "gray", _id);
     return result;
   } catch (e) {
     console.log("Problem in Updating Project Status", e);
@@ -96,6 +106,8 @@ const updateProjectType = async (_id, project_type) => {
       { _id: parseInt(_id) },
       { project_type }
     );
+    let content = "Project type changed to " + project_type;
+    await TimelineAPI.createNewTimeline(content, "gray", _id);
     return result;
   } catch (e) {
     console.log("Problem in Updating Project Type", e);
@@ -106,6 +118,8 @@ const updateProjectType = async (_id, project_type) => {
 const updateProjectCost = async (_id, cost) => {
   try {
     const result = await Project.updateOne({ _id: parseInt(_id) }, { cost });
+    let content = "Project cost's updated to " + cost;
+    await TimelineAPI.createNewTimeline(content, "gray", _id);
     return result;
   } catch (e) {
     console.log("Problem in Updating Leader", e);
@@ -125,6 +139,22 @@ const addTimeline = async (_id, timeline_id) => {
     return e;
   }
 };
+
+
+
+const addTimelineToProject = async (_id, timeline_id) => {
+  try {
+    const result = await Project.updateOne(
+      { _id },
+      { $push: { timelines: timeline_id } }
+    );
+    return result;
+  } catch (e) {
+    console.log("Problem in addTimeline", e);
+    return e;
+  }
+};
+
 
 const ifPresent = (array, _id) => {
   let found = false;
@@ -152,6 +182,9 @@ const addMember = async (_id, member_id) => {
         },
       }
     );
+    const member = await UserAPI.getUser(member_id);
+    let content = "New member " + member.name + " added to team.";
+    await TimelineAPI.createNewTimeline(content, "green", _id);
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
@@ -173,7 +206,9 @@ const addMembers = async (_id, member_id_array) => {
           total_tasks: 0,
           efficiency_score: "0",
         };
-
+        const member = await UserAPI.getUser(element._id);
+        let content = "New member " + member.name + " added to team.";
+        await TimelineAPI.createNewTimeline(content, "green", _id);
         members.push(tempObj);
       }
     }
@@ -226,4 +261,5 @@ module.exports = {
   addMembers,
   updateTTAES,
   getProjectsByMemberId,
+  addTimelineToProject
 };

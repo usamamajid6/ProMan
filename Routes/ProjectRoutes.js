@@ -4,6 +4,7 @@ const Project = require("../API/ProjectAPI");
 const Team = require("../API/TeamAPI");
 const User = require("../API/UserAPI");
 const TaskList = require("../API/TaskListAPI");
+const Task = require("../API/TaskAPI");
 // app.use(express.json());
 
 app.post("/createNewProject", async (req, res) => {
@@ -434,6 +435,50 @@ app.post("/getProjectData", async (req, res) => {
         status: "Success",
         message: "Get Project Succesfully!",
         data: { result, taskList },
+      });
+    } else {
+      //Get Project Unsuccessful
+      res.json({
+        status: "Failed",
+        message: "Project Not Found!",
+        data: result,
+      });
+    }
+  } catch (e) {
+    console.log("Problem in /getProjectById Route", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem in /getProjectById Router!",
+      data: e,
+    });
+  }
+});
+
+app.post("/getProjectDetailsForLeaderDashboard", async (req, res) => {
+  // Body Parameters
+  // _id // Project ID
+  // user_id // ID of user who accessing it
+  try {
+    const result = await Project.getProjectById(req.body._id);
+
+    if (result) {
+      //Get Project Successfully
+      let taskList = await TaskList.getTaskListsByProjectId(
+        result._id,
+        req.body.user_id
+      );
+      let overDueTasks = await Task.getOverDueTasks(req.body._id);
+      let upcomingDeadlines = await Task.getUpcomingDeadlines(req.body._id);
+      result.taskList = taskList;
+      res.json({
+        status: "Success",
+        message: "Get Project Succesfully!",
+        data: {
+          project: result,
+          taskList,
+          overDueTasks,
+          upcomingDeadlines,
+        },
       });
     } else {
       //Get Project Unsuccessful

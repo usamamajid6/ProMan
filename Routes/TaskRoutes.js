@@ -18,8 +18,6 @@ app.post("/createNewTask", async (req, res) => {
 
     if (result) {
       //Success in Creating New Task
-      await TaskList.addTask(req.body.task_list_id, result._id);
-
       res.json({
         status: "Success",
         message: "Task Created Succesfully!",
