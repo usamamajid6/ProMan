@@ -63,9 +63,21 @@ const getProjectById = async (_id) => {
       .populate("leader")
       .populate("timelines")
       .populate("members.member");
-    
-    // const result= await Project.find();
-    return result;
+
+    let data = result.toObject();
+    let members = data.members;
+
+    for (let i = 0; i < members.length; i++) {
+      // const element = members[i];
+      if (members[i].efficiency_score === 0) {
+        members[i].efficiency = 0;
+      } else {
+        members[i].efficiency =
+          members[i].efficiency_score / members[i].total_tasks;
+      }
+    }
+    data.members = members;
+    return data;
   } catch (e) {
     console.log("Problem in Getting Project By Id", e);
     return e;
@@ -140,8 +152,6 @@ const addTimeline = async (_id, timeline_id) => {
   }
 };
 
-
-
 const addTimelineToProject = async (_id, timeline_id) => {
   try {
     const result = await Project.updateOne(
@@ -154,7 +164,6 @@ const addTimelineToProject = async (_id, timeline_id) => {
     return e;
   }
 };
-
 
 const ifPresent = (array, _id) => {
   let found = false;
@@ -261,5 +270,5 @@ module.exports = {
   addMembers,
   updateTTAES,
   getProjectsByMemberId,
-  addTimelineToProject
+  addTimelineToProject,
 };

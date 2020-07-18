@@ -474,6 +474,11 @@ app.post("/getProjectDetailsForLeaderDashboard", async (req, res) => {
       );
       let overDueTasks = await Task.getOverDueTasks(req.body._id);
       let upcomingDeadlines = await Task.getUpcomingDeadlines(req.body._id);
+      let taskByTask = await Task.getAllTaskByProjectId(req.body._id);
+      let tasksByMembers = await Task.getTasksByMembers(
+        req.body._id,
+        result.members
+      );
       result.taskList = taskList;
       res.json({
         status: "Success",
@@ -483,6 +488,8 @@ app.post("/getProjectDetailsForLeaderDashboard", async (req, res) => {
           taskList,
           overDueTasks,
           upcomingDeadlines,
+          taskByTask,
+          tasksByMembers,
         },
       });
     } else {

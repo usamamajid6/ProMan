@@ -107,7 +107,7 @@ app.post("/uploadAttachment", upload.single("avatar"), function (
 
 app.get("/", (req, res) => {
   res.json({
-    Message: "Last Commit At 8:20 PM At July 12",
+    Message: "Last Commit At 1:00 PM At July 18",
   });
 });
 
@@ -125,9 +125,3 @@ console.log(new Date());
 //   console.log("====================================");
 // }, 10000);
 
-const m = async () => {
-  let result = await TaskAPI.getTasksBeforeDueDate(5);
-};
-
-
-console.log((-30 / 4) * 100);

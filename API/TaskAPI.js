@@ -619,6 +619,77 @@ const getUpcomingDeadlines = async (project_id) => {
   }
 };
 
+const getAllTaskByProjectId = async (project_id) => {
+  try {
+    const result = await Task.find({
+      project: project_id,
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
+    return result;
+  } catch (e) {
+    console.log("Problem in getOverDueTasks method", e);
+    return e;
+  }
+};
+
+const getTaskByMember = async (project_id, member_id) => {
+  try {
+    const result = await Task.find({
+      project: project_id,
+      "members._id": member_id,
+    });
+    return result;
+  } catch (e) {
+    console.log("Problem in getTaskByMember method", e);
+    return e;
+  }
+};
+
+const getTasksByMembers = async (project_id, members) => {
+  let data = [];
+  for (let i = 0; i < members.length; i++) {
+    const element = members[i];
+    let tasksByMember = {};
+    tasksByMember._id = element._id;
+    tasksByMember.name = element.member.name;
+    tasksByMember.email = element.member.email;
+    tasksByMember.tasks = await getTaskByMember(project_id, element._id);
+    data.push(tasksByMember);
+  }
+  try {
+    return data;
+  } catch (e) {
+    console.log("Problem in getTasksByMembers method", e);
+    return e;
+  }
+};
+
 module.exports = {
   createNewTask,
   getTaskById,
@@ -631,4 +702,6 @@ module.exports = {
   getTasksBeforeDueDate,
   getOverDueTasks,
   getUpcomingDeadlines,
+  getAllTaskByProjectId,
+  getTasksByMembers,
 };
