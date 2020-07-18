@@ -5,6 +5,7 @@ const Team = require("../API/TeamAPI");
 const User = require("../API/UserAPI");
 const TaskList = require("../API/TaskListAPI");
 const Task = require("../API/TaskAPI");
+const Chat = require("../API/ChatAPI");
 // app.use(express.json());
 
 app.post("/createNewProject", async (req, res) => {
@@ -300,7 +301,11 @@ app.put("/updateProjectCost", async (req, res) => {
 
 app.put("/addMemberToProject", async (req, res) => {
   try {
-    const result = await Project.addMember(req.body._id, req.body.member_id);
+    const result = await Project.addMember(
+      parseInt(req.body._id),
+      req.body.member_id
+    );
+
     if (result) {
       //Adding member to Project Successfully
       res.json({

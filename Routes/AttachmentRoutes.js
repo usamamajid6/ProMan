@@ -3,17 +3,55 @@ const app = express();
 const Attachment = require("../API/AttachmentAPI");
 const Task = require("../API/TaskAPI");
 
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname + new Date());
+  },
+});
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+});
+
+app.post("/addNewFile", upload.single("file"), async (req, res, next) => {
+  try {
+    // console.log("====================================");
+    // console.log(req.body);
+    // console.log("====================================");
+    // const result = await Attachment.createNewAttachment(
+    //   "name",
+    //   req.file.path,
+    //   1,
+    //   1,
+    //   1
+    // );
+    // // req.body.name,
+    //   // req.file.path,
+    //   // req.body.member_id,
+    //   // req.body.project_id,
+    //   // req.body.task_id
+    res.send(req.file);
+  } catch (e) {}
+});
+
 //This route create a new attachment and add this attachment_id to attachments field in Task
-app.post("/createNewAttachment", async (req, res) => {
+app.post("/createNewAttachment", upload.single(`file`), async (req, res) => {
   try {
     const result = await Attachment.createNewAttachment(
-      req.body.name,
-      req.body.path,
+      req.file.originalname,
+      req.file.path,
       req.body.member_id,
       req.body.project_id,
       req.body.task_id
     );
-
+    // let data = JSON.parse(req.body.data);
     if (result) {
       //Success in Creating New Attachment
       try {
@@ -23,14 +61,15 @@ app.post("/createNewAttachment", async (req, res) => {
         );
         if (secondResult) {
           //Success in Adding New Attachment To Task
-          res.json({
-            status: "Success",
-            message: "Attachment Created Succesfully!",
-            data: {
-              result,
-              secondResult,
-            },
-          });
+          // res.json({
+          //   status: "Success",
+          //   message: "Attachment Created Succesfully!",
+          //   data: {
+          //     result,
+          //     secondResult,
+          //   },
+          // });
+          res.send(req.file);
         } else {
           //Failed in Adding New Attachment To Task
           res.json({
@@ -131,6 +170,25 @@ app.post("/getAttachmentById", async (req, res) => {
       data: e,
     });
   }
+});
+
+app.get("/getAttachment/:fileDirectory/:filename/:orignalname", (req, res) => {
+  res.download(
+    `./${req.params.fileDirectory}/${req.params.filename}`,
+    `${req.params.orignalname}`,
+    function (err) {
+      if (err) {
+        res.json({
+          message: "Some Problem!",
+        });
+      } else {
+        // decrement a download credit, etc.
+      }
+    }
+  );
+  // console.log(req.params);
+
+  // res.json({ data: req.params.filename });
 });
 
 module.exports = app;

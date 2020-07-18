@@ -1,15 +1,18 @@
 const mongoose = require("mongoose");
-const AttachmentSchema = new mongoose.Schema(
+const ChatSchema = new mongoose.Schema(
   {
     _id: {
       type: Number,
       default: 1,
     },
-    name: String,
-    path: String,
+    message: String,
     member: {
       type: Number,
       ref: "User",
+    },
+    project: {
+      type: Number,
+      ref: "Project",
     },
   },
   {
@@ -17,4 +20,4 @@ const AttachmentSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Attachment", AttachmentSchema, "attachments");
+module.exports = mongoose.model("Chat", ChatSchema, "chats");

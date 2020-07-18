@@ -68,7 +68,7 @@ app.put("/addMultipleMemberToTeam", async (req, res) => {
   try {
     let result = await Team.addMembers(req.body._id, req.body.member_id_array);
     if (result) {
-      //Adding member to Team Successfully
+
       res.json({
         status: "Success",
         message: "Adding member to Team Succesfully!",

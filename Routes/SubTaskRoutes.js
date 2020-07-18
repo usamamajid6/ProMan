@@ -9,7 +9,7 @@ app.post("/createNewSubTask", async (req, res) => {
       req.body.name,
       req.body.description,
       req.body.member_id,
-      req.task_id,
+      req.body.task_id,
       req.body.project_id
     );
 

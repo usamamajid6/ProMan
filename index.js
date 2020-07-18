@@ -16,12 +16,14 @@ const TaskList = require("./Routes/TaskListRoutes");
 const Task = require("./Routes/TaskRoutes");
 const Team = require("./Routes/TeamRoutes");
 const Timeline = require("./Routes/TimelineRoutes");
+const Chat = require("./Routes/ChatRoutes");
 const Emailer = require("./Email");
-
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 // API Imports
-
 const TaskAPI = require("./API/TaskAPI");
-const TeamAPI = require("./API/TeamAPI");
+const AttachmentAPI = require("./API/AttachmentAPI");
+const ChatAPI = require("./API/ChatAPI.js");
 
 app.use(express.json());
 app.use(cors());
@@ -37,6 +39,8 @@ app.use(Task);
 app.use(TaskList);
 app.use(SubTask);
 app.use(Project);
+app.use(Chat);
+
 io.on("connection", (socket) => {
   socket.emit("fromServer", { data: "s" });
   // Project Room Joining
@@ -73,7 +77,32 @@ io.on("connection", (socket) => {
     io.to(room_name).emit("updateTaskData");
   });
 
+  // Add Chat
+  socket.on("addChatMessageToProject", async (data) => {
+    const room_name = "roomForProject#" + data.project_id;
+    const result = await ChatAPI.createNewChat(
+      data.message,
+      data.member_id,
+      data.project_id
+    );
+    io.to(room_name).emit("updateChatsData", result);
+  });
   socket.on("disconnect", () => console.log("Client disconnected"));
+});
+
+app.post("/uploadAttachment", upload.single("avatar"), function (
+  req,
+  res,
+  next
+) {
+  // req.file is the `avatar` file
+  // req.body will hold the text fields, if there were any
+  console.log("====================================");
+  console.log(req.file);
+  console.log("====================================");
+  console.log("====================================");
+  console.log(req.body);
+  console.log("====================================");
 });
 
 app.get("/", (req, res) => {
@@ -98,9 +127,7 @@ console.log(new Date());
 
 const m = async () => {
   let result = await TaskAPI.getTasksBeforeDueDate(5);
-  console.log("====================================");
-  console.log(result);
-  console.log("====================================");
 };
 
-m();
+
+console.log((-30 / 4) * 100);

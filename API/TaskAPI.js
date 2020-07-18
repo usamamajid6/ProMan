@@ -204,19 +204,24 @@ const updateTaskStatus = async (_id, status, member_id, project_id) => {
 };
 
 const getMinutesBetweenDates = (sDate, eDate) => {
-  var startDate = new Date(sDate);
-  var endDate = new Date(eDate);
-  var diffMs;
+  let ifEndDateIsGreater = false;
+  let startDate = new Date(sDate);
+  let endDate = new Date(eDate);
+  let diffMs;
   if (startDate > endDate) {
     diffMs = startDate - endDate;
   } else {
     diffMs = endDate - startDate;
+    ifEndDateIsGreater = true;
   }
-  var diffDays = Math.floor(diffMs / 86400000); // days
-  var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
-  var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+  let diffDays = Math.floor(diffMs / 86400000); // days
+  let diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+  let diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
   let totalMins =
     Math.abs(diffDays) * 24 * 60 + Math.abs(diffHrs) * 60 + Math.abs(diffMins);
+  if (ifEndDateIsGreater) {
+    totalMins *= -1;
+  }
   return totalMins;
 };
 
@@ -235,6 +240,11 @@ const updateTTAES = async (
       task_start_date,
       member_data.last_updated_on
     );
+    if (totalMinutesTakenByMember < 0) {
+      totalMinutesTakenByMember = Math.abs(totalMinutesTakenByMember);
+      totalMinutesTakenByMember =
+        totalMinutesTakenByMember + totalMinutesAssignForTask;
+    }
     if (totalMinutesTakenByMember === 0) {
       totalMinutesTakenByMember = 1;
     }
@@ -387,7 +397,34 @@ const getTasksBeforeDueDate = async (howMuchMinutesBefore) => {
   try {
     const result = await Task.find({
       due_date: { $gte: now, $lte: dateForCondition },
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
     return result;
   } catch (e) {
     return e;
@@ -400,7 +437,34 @@ const getOverDueTasks = async (project_id) => {
       project: project_id,
       status: "in-progress",
       due_date: { $lte: new Date() },
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
     return result;
   } catch (e) {
     console.log("Problem in getOverDueTasks method", e);
@@ -423,22 +487,130 @@ const getUpcomingDeadlines = async (project_id) => {
       project: project_id,
       status: "in-progress",
       due_date: { $gte: now, $lte: dateForInHour },
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
     const inSixHour = await Task.find({
       project: project_id,
       status: "in-progress",
       due_date: { $gte: now, $lte: dateForInSixHour },
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
     const inTweleveHour = await Task.find({
       project: project_id,
       status: "in-progress",
       due_date: { $gte: now, $lte: dateForInTwelveHour },
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
     const inDay = await Task.find({
       project: project_id,
       status: "in-progress",
       due_date: { $gte: now, $lte: dateForinDay },
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
     const result = { inHour, inSixHour, inTweleveHour, inDay };
     return result;
   } catch (e) {

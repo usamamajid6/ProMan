@@ -7,10 +7,6 @@ const Team = require("../API/TeamAPI");
 // app.use(express.json());
 
 app.post("/registerUser", async (req, res) => {
-  console.log("--------------------");
-  console.log(req.body);
-  console.log("--------------------");
-
   try {
     const uniqueEmailResult = await User.isEmailUnique(req.body.email);
     if (!uniqueEmailResult) {
@@ -517,6 +513,34 @@ app.put("/updateTTAES", async (req, res) => {
 app.post("/test", async (req, res) => {
   await User.isEmailUnique(req.body.email);
   res.send("/test");
+});
+
+app.post("/getUserByEmail", async (req, res) => {
+  try {
+    const result = await User.getUserByEmail(req.body.email);
+    if (result) {
+      //Get User Successfully
+      res.json({
+        status: "Success",
+        message: "Get User Succesfully!",
+        data: result,
+      });
+    } else {
+      //Get User Unsuccessful
+      res.json({
+        status: "Failed",
+        message: "User Not Found!",
+        data: result,
+      });
+    }
+  } catch (e) {
+    console.log("Problem in /getUser Route", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem in /getUser Router!",
+      data: e,
+    });
+  }
 });
 
 module.exports = app;
