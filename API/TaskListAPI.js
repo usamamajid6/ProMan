@@ -206,6 +206,9 @@ const getTaskListsByProjectId = async (project_id, user_id) => {
         {
           path: "sub_tasks",
         },
+        {
+          path: "subscriber",
+        },
       ],
     });
     // .populate("tasks.task.members")

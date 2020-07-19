@@ -118,10 +118,9 @@ console.log(new Date());
 
 // Send Notofication For Task Due in 30 Mins, 3 Hours, 6 Hours, 12 Hours, 1 Day Via E-mail
 
-// setInterval(async () => {
-//   let result = await TaskAPI.getTasksBeforeDueDate(5);
-//   console.log("====================================");
-//   console.log(result);
-//   console.log("====================================");
-// }, 10000);
-
+setInterval(async () => {
+  await TaskAPI.notifyUsersWhoseTasksDueDateInOneHour();
+  await TaskAPI.notifyUsersWhoseTasksDueDateInSixHour();
+  await TaskAPI.notifyUsersWhoseTasksDueDateInTwelveHour();
+  await TaskAPI.notifyUsersWhoseTasksDueDateInOneDay();
+}, 1000);

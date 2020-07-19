@@ -170,4 +170,48 @@ app.put("/updateTaskStatusLeader", async (req, res) => {
   }
 });
 
+app.post("/addSubscriberToTask", async (req, res) => {
+  try {
+    const result = await Task.addSubscriber(
+      req.body._id,
+      req.body.member_id,
+      req.body.project_id
+    );
+    res.json({
+      Status: "Success",
+      message: "Successfully Subscribed!",
+      data: result,
+    });
+  } catch (e) {
+    res.json({
+      Status: "Failed",
+      message: "Some Problem Occur!",
+      data: result,
+    });
+    console.log("Problem in /addSubscriberToTask!");
+  }
+});
+
+app.post("/removeSubscriberToTask", async (req, res) => {
+  try {
+    const result = await Task.removeSubscriber(
+      req.body._id,
+      req.body.member_id,
+      req.body.project_id
+    );
+    res.json({
+      Status: "Success",
+      message: "Successfully Unsubscribed!",
+      data: result,
+    });
+  } catch (e) {
+    res.json({
+      Status: "Failed",
+      message: "Some Problem Occur!",
+      data: result,
+    });
+    console.log("Problem in /removeSubscriberToTask!");
+  }
+});
+
 module.exports = app;

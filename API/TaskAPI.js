@@ -131,6 +131,9 @@ const getTaskById = async (_id) => {
       {
         path: "sub_tasks",
       },
+      {
+        path: "subscriber",
+      },
     ]);
     return task;
   } catch (e) {
@@ -141,8 +144,7 @@ const getTaskById = async (_id) => {
 
 const updateTaskStatus = async (_id, status, member_id, project_id) => {
   try {
-    const result = await Task.findOne({ _id }); // Get Task Data
-    let in_progress = true;
+    const result = await Task.findOne({ _id }).populate("subscriber"); // Get Task Data
     let pending = true;
     let done = true;
     let data = result.toObject(); // Save Task Data To other variable
@@ -196,6 +198,22 @@ const updateTaskStatus = async (_id, status, member_id, project_id) => {
       await TaskListAPI.addTask(doneListId, _id);
     }
 
+    // Send Email To Subscribers
+
+    let subscriber_email_array = [];
+    for (let i = 0; i < data.subscriber.length; i++) {
+      const element = data.subscriber[i];
+      subscriber_email_array.push(element.email);
+    }
+
+    let subject = "Task Status Changed on Subscribed Task!";
+    let message =
+      "AoA, Yours subscribed Task: " +
+      data.name +
+      "'s status has been changed to: " +
+      new_status.toUpperCase() +
+      ".";
+    Emailer.sendMail(subscriber_email_array, subject, message);
     return updatedResult;
   } catch (e) {
     console.log("Problem in Updating Task Status", e);
@@ -267,13 +285,20 @@ const updateTTAES = async (
 const updateTaskStatusLeader = async (_id, status, project_id) => {
   try {
     let members_email_array = [];
-    const result = await Task.findOne({ _id }).populate("members.member"); // Get Task Data
+    let subscriber_email_array = [];
+    const result = await Task.findOne({ _id })
+      .populate("members.member")
+      .populate("subscriber"); // Get Task Data
     let data = result.toObject(); // Save Task Data To other variable
     // Loop for checking  status of all members to set main status of task
     for (let i = 0; i < data.members.length; i++) {
       const element = data.members[i];
       element.task_status = status;
       members_email_array.push(element.member.email);
+    }
+    for (let i = 0; i < data.subscriber.length; i++) {
+      const element = data.subscriber[i];
+      subscriber_email_array.push(element.email);
     }
     //Setting new status for task and as well as for its members
     const updatedResult = await Task.updateOne(
@@ -302,6 +327,7 @@ const updateTaskStatusLeader = async (_id, status, project_id) => {
         updateTTAES(element, project_id, data.due_date, data.createdAt);
       }
     }
+    // Send Email To Members
     let subject = "Task Status Changed!";
     let message =
       "AoA, Your Task: " +
@@ -311,8 +337,17 @@ const updateTaskStatusLeader = async (_id, status, project_id) => {
       ".";
     Emailer.sendMail(members_email_array, subject, message);
 
-    // Add Timeline
+    // Send Email To Subscribers
+    subject = "Task Status Changed on Subscribed Task!";
+    message =
+      "AoA, Yours subscribed Task: " +
+      data.name +
+      "'s status has been changed to: " +
+      status.toUpperCase() +
+      ".";
+    Emailer.sendMail(subscriber_email_array, subject, message);
 
+    // Add Timeline
     const taskListData = await TaskListAPI.getTaskListById(currentTaskListId);
     let content =
       "Task " +
@@ -381,52 +416,6 @@ const addMember = async (_id, member_id) => {
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
-    return e;
-  }
-};
-
-const getTasksBeforeDueDate = async (howMuchMinutesBefore) => {
-  let now = new Date();
-  let dateForCondition = new Date();
-  dateForCondition.setMinutes(dateForCondition.getMinutes() + 12);
-
-  console.log("====================================");
-  console.log(now);
-  console.log(dateForCondition);
-  console.log("====================================");
-  try {
-    const result = await Task.find({
-      due_date: { $gte: now, $lte: dateForCondition },
-    }).populate([
-      {
-        path: "members.member",
-        select: { name: 1 },
-      },
-      {
-        path: "comments",
-        populate: {
-          path: "member",
-          select: { name: 1 },
-        },
-      },
-      {
-        path: "pre_req",
-        select: { name: 1 },
-      },
-      ,
-      {
-        path: "task_list",
-        select: { name: 1 },
-      },
-      {
-        path: "attachments",
-      },
-      {
-        path: "sub_tasks",
-      },
-    ]);
-    return result;
-  } catch (e) {
     return e;
   }
 };
@@ -663,7 +652,20 @@ const getTaskByMember = async (project_id, member_id) => {
     const result = await Task.find({
       project: project_id,
       "members._id": member_id,
-    });
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1 },
+      },
+      {
+        path: "sub_tasks",
+      },
+    ]);
+
     return result;
   } catch (e) {
     console.log("Problem in getTaskByMember method", e);
@@ -690,6 +692,222 @@ const getTasksByMembers = async (project_id, members) => {
   }
 };
 
+const notifyUsersWhoseTasksDueDateInOneHour = async () => {
+  let now = new Date();
+  let dateForCondition = new Date();
+  dateForCondition.setMinutes(dateForCondition.getMinutes() + 60);
+  try {
+    const result = await Task.find({
+      due_date: { $gte: now, $lte: dateForCondition },
+      status: "in-progress",
+      OneHourNotification: 0,
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1, email: 1 },
+      },
+    ]);
+    await Task.updateMany(
+      {
+        due_date: { $gte: now, $lte: dateForCondition },
+        OneHourNotification: 0,
+      },
+      { OneHourNotification: 1 }
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      const task = result[i];
+      for (let j = 0; j < task.members.length; j++) {
+        const member = task.members[j];
+        Emailer.sendMail(
+          [member.member.email],
+          "Task Due In One Hour!",
+          `The Task: ${task.name} is due with in One Hour`
+        );
+      }
+    }
+  } catch (e) {
+    return e;
+  }
+};
+
+const notifyUsersWhoseTasksDueDateInSixHour = async () => {
+  let now = new Date();
+  let dateForCondition = new Date();
+  dateForCondition.setMinutes(dateForCondition.getMinutes() + 6 * 60);
+  try {
+    const result = await Task.find({
+      due_date: { $gte: now, $lte: dateForCondition },
+      status: "in-progress",
+      SixHourNotification: 0,
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1, email: 1 },
+      },
+    ]);
+    await Task.updateMany(
+      {
+        due_date: { $gte: now, $lte: dateForCondition },
+        SixHourNotification: 0,
+      },
+      { SixHourNotification: 1 }
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      const task = result[i];
+      for (let j = 0; j < task.members.length; j++) {
+        const member = task.members[j];
+        Emailer.sendMail(
+          [member.member.email],
+          "Task Due In Six Hours!",
+          `The Task: ${task.name} is due with in Six Hours`
+        );
+      }
+    }
+  } catch (e) {
+    return e;
+  }
+};
+
+const notifyUsersWhoseTasksDueDateInTwelveHour = async () => {
+  let now = new Date();
+  let dateForCondition = new Date();
+  dateForCondition.setMinutes(dateForCondition.getMinutes() + 12 * 60);
+  try {
+    const result = await Task.find({
+      due_date: { $gte: now, $lte: dateForCondition },
+      status: "in-progress",
+      TwelveHourNotification: 0,
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1, email: 1 },
+      },
+    ]);
+    await Task.updateMany(
+      {
+        due_date: { $gte: now, $lte: dateForCondition },
+        TwelveHourNotification: 0,
+      },
+      { TwelveHourNotification: 1 }
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      const task = result[i];
+      for (let j = 0; j < task.members.length; j++) {
+        const member = task.members[j];
+        Emailer.sendMail(
+          [member.member.email],
+          "Task Due In Twelve Hours!",
+          `The Task: ${task.name} is due with in Twelve Hours`
+        );
+      }
+    }
+  } catch (e) {
+    return e;
+  }
+};
+
+const notifyUsersWhoseTasksDueDateInOneDay = async () => {
+  let now = new Date();
+  let dateForCondition = new Date();
+  dateForCondition.setMinutes(dateForCondition.getMinutes() + 12 * 60);
+  try {
+    const result = await Task.find({
+      due_date: { $gte: now, $lte: dateForCondition },
+      status: "in-progress",
+      OneDayNotification: 0,
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1, email: 1 },
+      },
+    ]);
+    await Task.updateMany(
+      {
+        due_date: { $gte: now, $lte: dateForCondition },
+        OneDayNotification: 0,
+      },
+      { OneDayNotification: 1 }
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      const task = result[i];
+      for (let j = 0; j < task.members.length; j++) {
+        const member = task.members[j];
+        Emailer.sendMail(
+          [member.member.email],
+          "Task Due In Twenty Four Hours!",
+          `The Task: ${task.name} is due with in Twenty Four Hours`
+        );
+      }
+    }
+  } catch (e) {
+    return e;
+  }
+};
+
+const ifPresent = (array, _id) => {
+  let found = -1;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === _id) {
+      found = i;
+      break;
+    }
+  }
+  return found;
+};
+
+const addSubscriber = async (_id, member_id, project_id) => {
+  try {
+    const res = await Task.findById(_id);
+    let subscriber = res.subscriber;
+    let ifFound = ifPresent(subscriber, member_id);
+    if (ifFound === -1) {
+      const member = await UserAPI.getUser(member_id);
+      let content = member.name + " subscribed to task: " + res.name;
+      await TimelineAPI.createNewTimeline(content, "green", project_id);
+      subscriber.push(member_id);
+      Emailer.sendMail(
+        [member.email],
+        "You Subscribed!",
+        `You have been subscribed to task: ${res.name}.`
+      );
+    }
+    const result = await Task.updateOne({ _id }, { subscriber });
+    return result;
+  } catch (e) {
+    console.log("Problem in addMember", e);
+    return e;
+  }
+};
+
+const removeSubscriber = async (_id, member_id, project_id) => {
+  try {
+    const res = await Task.findById(_id);
+    let subscriber = res.subscriber;
+    let ifFound = ifPresent(subscriber, member_id);
+
+    if (ifFound !== -1) {
+      const member = await UserAPI.getUser(member_id);
+      let content = member.name + " unsubscribed to task: " + res.name;
+      await TimelineAPI.createNewTimeline(content, "blue", project_id);
+      subscriber.splice(ifFound, 1);
+      Emailer.sendMail(
+        [member.email],
+        "You Unsubscribed!",
+        `You have been unsubscribed to task: ${res.name}.`
+      );
+    }
+    const result = await Task.updateOne({ _id }, { subscriber });
+    return result;
+  } catch (e) {
+    console.log("Problem in addMember", e);
+    return e;
+  }
+};
+
 module.exports = {
   createNewTask,
   getTaskById,
@@ -699,9 +917,14 @@ module.exports = {
   addComment,
   addSubTask,
   addMember,
-  getTasksBeforeDueDate,
+  notifyUsersWhoseTasksDueDateInOneHour,
+  notifyUsersWhoseTasksDueDateInSixHour,
+  notifyUsersWhoseTasksDueDateInTwelveHour,
+  notifyUsersWhoseTasksDueDateInOneDay,
   getOverDueTasks,
   getUpcomingDeadlines,
   getAllTaskByProjectId,
   getTasksByMembers,
+  addSubscriber,
+  removeSubscriber,
 };

@@ -66,6 +66,12 @@ const TaskSchema = new mongoose.Schema(
         ref: "SubTask",
       },
     ],
+    subscriber: [
+      {
+        type: Number,
+        ref: "User",
+      },
+    ],
     OneHourNotification: {
       type: Number,
       default: 0,
