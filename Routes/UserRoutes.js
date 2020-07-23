@@ -270,7 +270,7 @@ app.post("/registerUserGoogleFB", async (req, res) => {
   }
 });
 
-app.post("/loginUserGoogleFB", async (req, res) => {
+app.post("/loginUserGoogleFB<<depreciated>>", async (req, res) => {
   try {
     const result = await User.loginUserGoogleFB(req.body.email);
     if (result) {
@@ -541,6 +541,72 @@ app.post("/getUserByEmail", async (req, res) => {
       data: e,
     });
   }
+});
+
+app.post("/loginUserGoogleFB", async (req, res) => {
+  try {
+    let result = await User.loginUserGoogleFB(req.body.email);
+    if (!result) {
+      result = null;
+      result = await User.registerUserGoogleFB(req.body.name, req.body.email);
+    }
+    try {
+      const secondResult = await Project.getProjectsByMemberId(result._id);
+      if (secondResult) {
+        //Success in getting User Projects
+        try {
+          const thirdResult = await Team.getTeamsByMemberId(result._id);
+          if (thirdResult) {
+            //Success in getting User Teams
+            res.json({
+              status: "Success",
+              message: "User Login Successfully!",
+              data: {
+                result,
+                secondResult,
+                thirdResult,
+              },
+            });
+          } else {
+            //Problem in getting User Projects
+            res.json({
+              status: "Failed",
+              message: "Problem in getting User Teams!",
+              data: {
+                result,
+                secondResult,
+                thirdResult,
+              },
+            });
+          }
+        } catch (e) {
+          console.log("Problem in /loginUserGoogleFB Route", e);
+          res.json({
+            status: "Failed",
+            message: "Some Problem in /loginUserGoogleFB Router!",
+            data: e,
+          });
+        }
+      } else {
+        //Problem in getting User Projects
+        res.json({
+          status: "Failed",
+          message: "Problem in getting User Projects!",
+          data: {
+            result,
+            secondResult,
+          },
+        });
+      }
+    } catch (e) {
+      console.log("Problem in /loginUserGoogleFB Route", e);
+      res.json({
+        status: "Failed",
+        message: "Some Problem in /loginUserGoogleFB Router!",
+        data: e,
+      });
+    }
+  } catch (e) {}
 });
 
 module.exports = app;
