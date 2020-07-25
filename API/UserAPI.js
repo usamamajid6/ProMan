@@ -1,6 +1,7 @@
 const User = require("../Schemas/UserSchema");
 const bcrypt = require("bcryptjs");
 const generatePassword = require("password-generator");
+const Email = require("../Email");
 
 const isEmailUnique = async (email) => {
   try {
@@ -27,9 +28,6 @@ const getLastId = async () => {
 };
 
 const registerUser = async (name, email, password, phone_number) => {
-  console.log("------------------------------");
-  console.log(name);
-  console.log("------------------------------");
   try {
     let _id = await getLastId();
     _id = parseInt(_id);
@@ -42,9 +40,16 @@ const registerUser = async (name, email, password, phone_number) => {
       email,
       password,
       phone_number,
+      isVerified: false,
     });
     try {
       const result = await User.create(user);
+      Email.sendMail(
+        [email],
+        "Verfiy Your Account!",
+        "<div>Click This Link To Verify Your Account!</div>   http://localhost:3000/verifyUser/" +
+          _id 
+      );
       return result;
     } catch (e) {
       console.log("Problem in Adding New User.", e);
@@ -171,16 +176,22 @@ const registerUserGoogleFB = async (name, email) => {
     let _id = await getLastId();
     _id = parseInt(_id);
     ++_id;
-    password = await generatePassword(12, false);
+    password = generatePassword(12, false);
+    let genPass =password;
     password = await bcrypt.hash(password, 10);
     const user = new User({
       _id,
       name,
       email,
       password,
+      isVerified: true,
     });
     try {
       const result = await User.create(user);
+      Email.sendMail(
+        [email],
+        "Welcome To ProMan!", "<div>You can use this password for logging in <b>"+ genPass +"</b> </div>"
+      );
       return result;
     } catch (e) {
       console.log("Problem in Adding New User By Google/FB.", e);
@@ -207,6 +218,16 @@ const loginUserGoogleFB = async (email) => {
   }
 };
 
+const verifyUser = async (_id) => {
+  try {
+    const result = await User.updateOne({ _id }, { isVerified: true });
+    return result;
+  } catch (e) {
+    console.log("Problem in verifyUser", e);
+    return e;
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -219,4 +240,5 @@ module.exports = {
   registerUserGoogleFB,
   loginUserGoogleFB,
   getUserByEmail,
+  verifyUser,
 };

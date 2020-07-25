@@ -193,7 +193,7 @@ const getTaskListsByProjectId = async (project_id, user_id) => {
         },
         {
           path: "pre_req",
-          select: { name: 1 },
+          select: { name: 1, status: 1 },
         },
         ,
         {

@@ -181,11 +181,6 @@ app.post("/getUserById", async (req, res) => {
               data: e,
             });
           }
-          res.json({
-            status: "Success",
-            message: "User Login Succesfully!",
-            data: result,
-          });
         } else {
           //Problem in getting User Projects
           res.json({
@@ -607,6 +602,23 @@ app.post("/loginUserGoogleFB", async (req, res) => {
       });
     }
   } catch (e) {}
+});
+
+app.put("/verifyUser", async (req, res) => {
+  try {
+    const result = await User.verifyUser(req.body._id);
+    res.json({
+      status: "Success",
+      message: "User Verified Successfully!",
+      data: result,
+    });
+  } catch (e) {
+    console.log("Problem in /verifyUser Route", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem Occur!",
+    });
+  }
 });
 
 module.exports = app;

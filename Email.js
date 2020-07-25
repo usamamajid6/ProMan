@@ -56,7 +56,7 @@ const returnMailOptions = (receivers_array, subject, message) => {
     from: "mailuseformailtester@gmail.com",
     to,
     subject,
-    text: message,
+    html: message,
   };
   return mailOptions;
 };

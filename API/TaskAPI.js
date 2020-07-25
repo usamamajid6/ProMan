@@ -118,7 +118,7 @@ const getTaskById = async (_id) => {
       },
       {
         path: "pre_req",
-        select: { name: 1 },
+        select: { name: 1, status: 1 },
       },
       ,
       {

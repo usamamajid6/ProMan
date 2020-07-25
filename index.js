@@ -90,24 +90,9 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => console.log("Client disconnected"));
 });
 
-app.post("/uploadAttachment", upload.single("avatar"), function (
-  req,
-  res,
-  next
-) {
-  // req.file is the `avatar` file
-  // req.body will hold the text fields, if there were any
-  console.log("====================================");
-  console.log(req.file);
-  console.log("====================================");
-  console.log("====================================");
-  console.log(req.body);
-  console.log("====================================");
-});
-
 app.get("/", (req, res) => {
   res.json({
-    Message: "Last Commit At 11:48 PM At July 23",
+    Message: "Last Commit At 2:31 PM At July 25",
   });
 });
 
