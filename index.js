@@ -17,16 +17,18 @@ const Task = require("./Routes/TaskRoutes");
 const Team = require("./Routes/TeamRoutes");
 const Timeline = require("./Routes/TimelineRoutes");
 const Chat = require("./Routes/ChatRoutes");
-const Emailer = require("./Email");
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+// const Emailer = require("./Email");
+// const multer = require("multer");
+// const upload = multer({ dest: "uploads/" });
 // API Imports
 const TaskAPI = require("./API/TaskAPI");
-const AttachmentAPI = require("./API/AttachmentAPI");
+// const AttachmentAPI = require("./API/AttachmentAPI");
 const ChatAPI = require("./API/ChatAPI.js");
-
+const jwt = require("jsonwebtoken");
+const JWTKey = require("./JWTKey");
 app.use(express.json());
 app.use(cors());
+app.use(express.static('uploads'))
 
 connectToDB();
 
@@ -92,7 +94,7 @@ io.on("connection", (socket) => {
 
 app.get("/", (req, res) => {
   res.json({
-    Message: "Last Commit At 2:31 PM At July 25",
+    Message: "Last Commit At 9:00 PM At July 26",
   });
 });
 
@@ -101,7 +103,7 @@ server.listen(PORT, (e) => {
 });
 console.log(new Date());
 
-// Send Notofication For Task Due in 30 Mins, 3 Hours, 6 Hours, 12 Hours, 1 Day Via E-mail
+// Send Notofication For Task Due in 30 Mins, 6 Hours, 12 Hours, 1 Day Via E-mail
 
 setInterval(async () => {
   await TaskAPI.notifyUsersWhoseTasksDueDateInOneHour();
@@ -109,3 +111,10 @@ setInterval(async () => {
   await TaskAPI.notifyUsersWhoseTasksDueDateInTwelveHour();
   await TaskAPI.notifyUsersWhoseTasksDueDateInOneDay();
 }, 1000);
+
+// TaskAPI.getTasksInHierarchy(1);
+
+var token =  jwt.sign({ foo: 'bar' }, JWTKey);
+console.log("====================================");
+console.log(token);
+console.log("====================================");

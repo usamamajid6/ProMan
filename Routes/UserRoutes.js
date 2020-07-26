@@ -97,11 +97,6 @@ app.post("/loginUser", async (req, res) => {
               data: e,
             });
           }
-          res.json({
-            status: "Success",
-            message: "User Login Succesfully!",
-            data: result,
-          });
         } else {
           //Problem in getting User Projects
           res.json({

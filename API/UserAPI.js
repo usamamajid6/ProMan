@@ -2,7 +2,8 @@ const User = require("../Schemas/UserSchema");
 const bcrypt = require("bcryptjs");
 const generatePassword = require("password-generator");
 const Email = require("../Email");
-
+const jwt = require("jsonwebtoken");
+const JWTKey = require("../JWTKey");
 const isEmailUnique = async (email) => {
   try {
     const result = await User.findOne({ email });
@@ -32,8 +33,8 @@ const registerUser = async (name, email, password, phone_number) => {
     let _id = await getLastId();
     _id = parseInt(_id);
     ++_id;
-    // let _id=1;
     password = await bcrypt.hash(password, 10);
+
     const user = new User({
       _id,
       name,
@@ -44,11 +45,12 @@ const registerUser = async (name, email, password, phone_number) => {
     });
     try {
       const result = await User.create(user);
+      const token = jwt.sign({ _id }, JWTKey);
       Email.sendMail(
         [email],
         "Verfiy Your Account!",
         "<div>Click This Link To Verify Your Account!</div>   http://localhost:3000/verifyUser/" +
-          _id 
+          token
       );
       return result;
     } catch (e) {
@@ -177,7 +179,7 @@ const registerUserGoogleFB = async (name, email) => {
     _id = parseInt(_id);
     ++_id;
     password = generatePassword(12, false);
-    let genPass =password;
+    let genPass = password;
     password = await bcrypt.hash(password, 10);
     const user = new User({
       _id,
@@ -190,7 +192,10 @@ const registerUserGoogleFB = async (name, email) => {
       const result = await User.create(user);
       Email.sendMail(
         [email],
-        "Welcome To ProMan!", "<div>You can use this password for logging in <b>"+ genPass +"</b> </div>"
+        "Welcome To ProMan!",
+        "<div>You can use this password for logging in <b>" +
+          genPass +
+          "</b> </div>"
       );
       return result;
     } catch (e) {

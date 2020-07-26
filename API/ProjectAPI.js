@@ -139,6 +139,29 @@ const updateProjectCost = async (_id, cost) => {
   }
 };
 
+const updateProjectData = async (
+  _id,
+  name,
+  description,
+  status,
+  project_type,
+  cost,
+  end_date
+) => {
+  try {
+    const result = await Project.updateOne(
+      { _id: parseInt(_id) },
+      { name, description, status, cost, project_type, end_date }
+    );
+    let content = "Project's data updated";
+    await TimelineAPI.createNewTimeline(content, "gray", _id);
+    return result;
+  } catch (e) {
+    console.log("Problem in Updating Leader", e);
+    return e;
+  }
+};
+
 const addTimeline = async (_id, timeline_id) => {
   try {
     const result = await Project.updateOne(
@@ -271,4 +294,5 @@ module.exports = {
   updateTTAES,
   getProjectsByMemberId,
   addTimelineToProject,
+  updateProjectData,
 };

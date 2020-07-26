@@ -908,6 +908,45 @@ const removeSubscriber = async (_id, member_id, project_id) => {
   }
 };
 
+const getDependableTasks = async (task) => {
+  try {
+    let children = [];
+    let data = task.toObject();
+    data.children = [];
+    const dependableTasks = await Task.find({ pre_req: data._id });
+    if (dependableTasks.length === 0) {
+      return data;
+    } else {
+      for (let i = 0; i < dependableTasks.length; i++) {
+        const element = dependableTasks[i];
+        let childData = await getDependableTasks(element);
+        children.push(childData);
+      }
+      data.children = children;
+      return data;
+    }
+  } catch (e) {
+    console.log("Problem in getDependableTasks", e);
+    return e;
+  }
+};
+
+const getTasksInHierarchy = async (project_id) => {
+  try {
+    let data = [];
+    const result = await Task.find({ project: project_id, pre_req: 0 });
+    for (let i = 0; i < result.length; i++) {
+      const element = result[i];
+      let dependableTasks = await getDependableTasks(element);
+      data.push(dependableTasks);
+    }
+    return data;
+  } catch (e) {
+    console.log("Problem in getTasksInHierarchy", e);
+    return e;
+  }
+};
+
 module.exports = {
   createNewTask,
   getTaskById,
@@ -927,4 +966,5 @@ module.exports = {
   getTasksByMembers,
   addSubscriber,
   removeSubscriber,
+  getTasksInHierarchy,
 };

@@ -299,6 +299,42 @@ app.put("/updateProjectCost", async (req, res) => {
   }
 });
 
+app.put("/updateProjectData", async (req, res) => {
+  try {
+    const result = await Project.updateProjectData(
+      req.body._id,
+      req.body.name,
+      req.body.description,
+      req.body.status,
+      req.body.project_type,
+      req.body.cost,
+      req.body.end_date
+    );
+    if (result) {
+      //Project Data Updated Successfully
+      res.json({
+        status: "Success",
+        message: "Project Data Updated Succesfully!",
+        data: result,
+      });
+    } else {
+      //Project Data Updated Unsuccessful
+      res.json({
+        status: "Failed",
+        message: "Some problem occur!",
+        data: result,
+      });
+    }
+  } catch (e) {
+    console.log("Problem in /updateProjectData Route", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem in /updateProjectData Router!",
+      data: e,
+    });
+  }
+});
+
 app.put("/addMemberToProject", async (req, res) => {
   try {
     const result = await Project.addMember(
@@ -479,6 +515,7 @@ app.post("/getProjectDetailsForLeaderDashboard", async (req, res) => {
         req.body._id,
         result.members
       );
+      let tasksHierarchy = await Task.getTasksInHierarchy(req.body._id);
       result.taskList = taskList;
       res.json({
         status: "Success",
@@ -490,6 +527,7 @@ app.post("/getProjectDetailsForLeaderDashboard", async (req, res) => {
           upcomingDeadlines,
           taskByTask,
           tasksByMembers,
+          tasksHierarchy,
         },
       });
     } else {
