@@ -4,6 +4,22 @@ const User = require("../API/UserAPI");
 const Project = require("../API/ProjectAPI");
 const Team = require("../API/TeamAPI");
 
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "DPUploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "_" + file.originalname);
+  },
+});
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+});
 // app.use(express.json());
 
 app.post("/registerUser", async (req, res) => {

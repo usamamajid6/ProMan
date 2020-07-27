@@ -213,7 +213,9 @@ const updateTaskStatus = async (_id, status, member_id, project_id) => {
       "'s status has been changed to: " +
       new_status.toUpperCase() +
       ".";
-    Emailer.sendMail(subscriber_email_array, subject, message);
+    if (subscriber_email_array.length !== 0) {
+      Emailer.sendMail(subscriber_email_array, subject, message);
+    }
     return updatedResult;
   } catch (e) {
     console.log("Problem in Updating Task Status", e);
@@ -345,8 +347,9 @@ const updateTaskStatusLeader = async (_id, status, project_id) => {
       "'s status has been changed to: " +
       status.toUpperCase() +
       ".";
-    Emailer.sendMail(subscriber_email_array, subject, message);
-
+    if (subscriber_email_array.length !== 0) {
+      Emailer.sendMail(subscriber_email_array, subject, message);
+    }
     // Add Timeline
     const taskListData = await TaskListAPI.getTaskListById(currentTaskListId);
     let content =

@@ -7,42 +7,43 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null,"./uploads");
+    cb(null, "AttchmentUploads");
   },
   filename: function (req, file, cb) {
-    cb(null, new Date() + "_" + file.originalname);
+    cb(null, Date.now() + "_" + file.originalname);
   },
 });
 const upload = multer({
-  storage: storage,
+  storage,
   limits: {
     fileSize: 1024 * 1024 * 5,
   },
 });
 
-app.post("/addNewFile", upload.single("file"), async (req, res, next) => {
-  try {
-    // console.log("====================================");
-    // console.log(req.body);
-    // console.log("====================================");
-    // const result = await Attachment.createNewAttachment(
-    //   "name",
-    //   req.file.path,
-    //   1,
-    //   1,
-    //   1
-    // );
-    // // req.body.name,
-    //   // req.file.path,
-    //   // req.body.member_id,
-    //   // req.body.project_id,
-    //   // req.body.task_id
-    res.send(req.file);
-  } catch (e) {}
-});
+// app.post("/addNewFile", upload.single("file"), async (req, res, next) => {
+//   try {
+//     // console.log("====================================");
+//     // console.log(req.body);
+//     // console.log("====================================");
+//     // const result = await Attachment.createNewAttachment(
+//     //   "name",
+//     //   req.file.path,
+//     //   1,
+//     //   1,
+//     //   1
+//     // );
+//     // // req.body.name,
+//     //   // req.file.path,
+//     //   // req.body.member_id,
+//     //   // req.body.project_id,
+//     //   // req.body.task_id
+//     res.send(req.file);
+//   } catch (e) {}
+// });
 
 //This route create a new attachment and add this attachment_id to attachments field in Task
-app.post("/createNewAttachment", upload.single(`file`), async (req, res) => {
+app.post("/createNewAttachment", upload.single("file"), async (req, res) => {
+  // res.send(req.file);
   try {
     const result = await Attachment.createNewAttachment(
       req.file.originalname,
@@ -61,15 +62,15 @@ app.post("/createNewAttachment", upload.single(`file`), async (req, res) => {
         );
         if (secondResult) {
           //Success in Adding New Attachment To Task
-          // res.json({
-          //   status: "Success",
-          //   message: "Attachment Created Succesfully!",
-          //   data: {
-          //     result,
-          //     secondResult,
-          //   },
-          // });
-          res.send(req.file);
+          res.json({
+            status: "Success",
+            message: "Attachment Created Succesfully!",
+            data: {
+              result,
+              secondResult,
+            },
+          });
+          // res.send(req.file);
         } else {
           //Failed in Adding New Attachment To Task
           res.json({
