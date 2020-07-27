@@ -233,6 +233,16 @@ const verifyUser = async (_id) => {
   }
 };
 
+const uploadDP = async (_id, path) => {
+  try {
+    const result = await User.updateOne({ _id }, { dp: path });
+    return result;
+  } catch (e) {
+    console.log("Problem in uploadDP", e);
+    return e;
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -246,4 +256,5 @@ module.exports = {
   loginUserGoogleFB,
   getUserByEmail,
   verifyUser,
+  uploadDP,
 };

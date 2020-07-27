@@ -188,7 +188,7 @@ const getTaskListsByProjectId = async (project_id, user_id) => {
           path: "comments",
           populate: {
             path: "member",
-            select: { name: 1 },
+            select: { name: 1, dp: 1 },
           },
         },
         {

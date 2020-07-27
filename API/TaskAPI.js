@@ -113,7 +113,7 @@ const getTaskById = async (_id) => {
         path: "comments",
         populate: {
           path: "member",
-          select: { name: 1 },
+          select: { name: 1, dp: 1 },
         },
       },
       {
@@ -624,7 +624,7 @@ const getAllTaskByProjectId = async (project_id) => {
         path: "comments",
         populate: {
           path: "member",
-          select: { name: 1 },
+          select: { name: 1, dp: 1 },
         },
       },
       {

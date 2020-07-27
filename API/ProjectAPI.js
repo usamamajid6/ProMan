@@ -273,7 +273,9 @@ const updateTTAES = async (_id, member_id, efficiency_score) => {
 
 const getProjectsByMemberId = async (member_id) => {
   try {
-    const result = await Project.find({ "members.member": member_id });
+    const result = await Project.find({ "members.member": member_id }).sort({
+      updatedAt: -1,
+    });
     return result;
   } catch (e) {
     console.log("Problem in getProjectsByMemberId", e);

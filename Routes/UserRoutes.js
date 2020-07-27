@@ -632,4 +632,21 @@ app.put("/verifyUser", async (req, res) => {
   }
 });
 
+app.post("/uploadDP", upload.single("dp"), async (req, res) => {
+  try {
+    const result = await User.uploadDP(req.body._id, req.file.path);
+    res.json({
+      status: "Success",
+      message: "Profile Picture Uploaded Successfully!",
+      data: result,
+    });
+  } catch (e) {
+    console.log("Problem in /uploadDP Route", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem Occur!",
+    });
+  }
+});
+
 module.exports = app;

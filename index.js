@@ -28,7 +28,8 @@ const jwt = require("jsonwebtoken");
 const JWTKey = require("./JWTKey");
 app.use(express.json());
 app.use(cors());
-app.use(express.static('uploads'))
+app.use("/AttachmentUploads", express.static("AttachmentUploads"));
+app.use("/DPUploads", express.static("DPUploads"));
 
 connectToDB();
 
@@ -94,7 +95,7 @@ io.on("connection", (socket) => {
 
 app.get("/", (req, res) => {
   res.json({
-    Message: "Last Commit At 9:00 PM At July 26",
+    Message: "Last Commit At 10:00 PM At July 27",
   });
 });
 
@@ -114,7 +115,7 @@ setInterval(async () => {
 
 // TaskAPI.getTasksInHierarchy(1);
 
-var token =  jwt.sign({ foo: 'bar' }, JWTKey);
+var token = jwt.sign({ foo: "bar" }, JWTKey);
 console.log("====================================");
 console.log(token);
 console.log("====================================");
