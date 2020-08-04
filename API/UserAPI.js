@@ -66,7 +66,6 @@ const registerUser = async (name, email, password, phone_number) => {
 const loginUser = async (email, password) => {
   try {
     const user = await await User.findOne({ email });
-    ("");
     if (user) {
       try {
         //user email found

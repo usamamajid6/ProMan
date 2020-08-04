@@ -4,7 +4,8 @@ const http = require("http");
 const socketIo = require("socket.io");
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server); // < Interesting!
+const io = socketIo(server);
+const morgan = require("morgan");
 const PORT = 2222 || process.env.PORT;
 const { connectToDB } = require("./connectToDB.js");
 const User = require("./Routes/UserRoutes");
@@ -17,22 +18,20 @@ const Task = require("./Routes/TaskRoutes");
 const Team = require("./Routes/TeamRoutes");
 const Timeline = require("./Routes/TimelineRoutes");
 const Chat = require("./Routes/ChatRoutes");
-// const Emailer = require("./Email");
-// const multer = require("multer");
-// const upload = multer({ dest: "uploads/" });
+const Notification = require("./Routes/NotificationRoutes");
+
 // API Imports
 const TaskAPI = require("./API/TaskAPI");
-// const AttachmentAPI = require("./API/AttachmentAPI");
-const ChatAPI = require("./API/ChatAPI.js");
-const jwt = require("jsonwebtoken");
-const JWTKey = require("./JWTKey");
+
 app.use(express.json());
 app.use(cors());
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms")
+);
 app.use("/AttachmentUploads", express.static("AttachmentUploads"));
 app.use("/DPUploads", express.static("DPUploads"));
-
 connectToDB();
-
+require("./socketIO")(io);
 app.use(Attachment);
 app.use(Comment);
 app.use(User);
@@ -43,59 +42,15 @@ app.use(TaskList);
 app.use(SubTask);
 app.use(Project);
 app.use(Chat);
-
-io.on("connection", (socket) => {
-  socket.emit("fromServer", { data: "s" });
-  // Project Room Joining
-  socket.on("joinTheProjectRoom", (data) => {
-    const room_name = "roomForProject#" + data._id;
-
-    socket.join(room_name);
-  });
-  // Project Room Leaving
-  socket.on("leaveTheProjectRoom", (data) => {
-    const room_name = "roomForProject#" + data._id;
-
-    socket.leave(room_name);
-  });
-  // For updating Project Data
-  socket.on("tellRoomMatesToUpdateProject", (data) => {
-    const room_name = "roomForProject#" + data._id;
-    io.to(room_name).emit("updateProjectData");
-  });
-
-  // Task Room
-  socket.on("joinTheTaskRoom", (data) => {
-    const room_name = "roomForTask#" + data._id;
-
-    socket.join(room_name);
-  });
-  socket.on("leaveTheTaskRoom", (data) => {
-    const room_name = "roomForTask#" + data._id;
-
-    socket.leave(room_name);
-  });
-  socket.on("tellRoomMatesToUpdateTask", (data) => {
-    const room_name = "roomForTask#" + data._id;
-    io.to(room_name).emit("updateTaskData");
-  });
-
-  // Add Chat
-  socket.on("addChatMessageToProject", async (data) => {
-    const room_name = "roomForProject#" + data.project_id;
-    const result = await ChatAPI.createNewChat(
-      data.message,
-      data.member_id,
-      data.project_id
-    );
-    io.to(room_name).emit("updateChatsData", result);
-  });
-  socket.on("disconnect", () => console.log("Client disconnected"));
-});
+app.use(Notification);
 
 app.get("/", (req, res) => {
+  console.log("====================================");
+  console.log(req.body);
+  console.log("====================================");
   res.json({
-    Message: "Last Commit At 10:00 PM At July 27",
+    status: true,
+    message: "Last Commit At 09:34 PM At August 04",
   });
 });
 
@@ -114,8 +69,3 @@ setInterval(async () => {
 }, 1000);
 
 // TaskAPI.getTasksInHierarchy(1);
-
-var token = jwt.sign({ foo: "bar" }, JWTKey);
-console.log("====================================");
-console.log(token);
-console.log("====================================");

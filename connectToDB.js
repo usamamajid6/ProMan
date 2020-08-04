@@ -12,4 +12,5 @@ connectToDB = () => {
   );
 };
 
+
 module.exports = { connectToDB };

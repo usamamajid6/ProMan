@@ -1,5 +1,6 @@
 const Team = require("../Schemas/TeamSchema");
-
+const NotificationAPI = require("./NotificationAPI");
+const Emailer = require("../Email");
 const getLastId = async () => {
   try {
     const result = await Team.find().sort({ _id: -1 }).limit(1);
@@ -72,6 +73,18 @@ const addMember = async (_id, member_id) => {
       { _id },
       { $push: { members: member_id } }
     );
+    let data = await Team.findOne({ _id });
+    let subject = "You added to Team!";
+    let message =
+      "<div> <b> AoA </b> </div>,<div> In Team:<b> " +
+      data.name +
+      "</b> you are added as a memeber </div> ";
+    Emailer.sendMail([member_id], subject, message);
+    await NotificationAPI.createNewNotification(
+      "Added To Team!",
+      `You have been added to Team: ${data.name}`,
+      member_id
+    );
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
@@ -102,6 +115,25 @@ const addMembers = async (_id, member_id_array) => {
     }
 
     const result = await Team.updateOne({ _id }, { members });
+
+    let data = await Team.findOne({ _id }).populate("members");
+    let members_email_array = [];
+    for (let i = 0; i < data.members.length; i++) {
+      const element = data.members[i];
+      members_email_array.push(element.email);
+      await NotificationAPI.createNewNotification(
+        "Added To New Team!",
+        `You have been added to Team: ${data.name}`,
+        element._id
+      );
+    }
+    let subject = "You added to New Team!";
+    let message =
+      "<div> <b> AoA </b> </div>,<div> A new Team:<b> " +
+      data.name +
+      "</b> is created and you are added as a memeber </div> ";
+    Emailer.sendMail(members_email_array, subject, message);
+
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
@@ -113,7 +145,9 @@ const updateESATTOM = () => {};
 
 const getTeamsByMemberId = async (member_id) => {
   try {
-    const result = await Team.find({ members: member_id }).populate("projects").populate("members");
+    const result = await Team.find({ members: member_id })
+      .populate("projects")
+      .populate("members");
     return result;
   } catch (e) {
     console.log("Problem in getTeamsByMemberId", e);

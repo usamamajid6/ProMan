@@ -67,7 +67,7 @@ const addTask = async (_id, task_id) => {
     const res = await TaskList.findById(_id);
     let tasks = res.tasks;
     if (!ifPresent(tasks, task_id)) {
-      tasks.push(task_id);
+      tasks.unshift(task_id);
     }
     const result = await TaskList.updateOne({ _id }, { tasks });
     return result;

@@ -5,6 +5,10 @@ const UserAPI = require("../API/UserAPI");
 const Project = require("../API/ProjectAPI");
 const Emailer = require("../Email");
 const TimelineAPI = require("./TimelineAPI");
+const NotificationAPI = require("./NotificationAPI");
+const emitter = require("events").EventEmitter;
+const em = new emitter();
+
 const getLastId = async () => {
   try {
     const result = await Task.find().sort({ _id: -1 }).limit(1);
@@ -71,6 +75,11 @@ const createNewTask = async (
       for (let i = 0; i < data.members.length; i++) {
         const element = data.members[i];
         members_email_array.push(element.member.email);
+        await NotificationAPI.createNewNotification(
+          "Task Assigned!",
+          `You have been assigned to new Task: ${data.name}`,
+          element.member._id
+        );
       }
       let subject = "New Task Has Been Assigned!";
       let message =
@@ -204,6 +213,13 @@ const updateTaskStatus = async (_id, status, member_id, project_id) => {
     for (let i = 0; i < data.subscriber.length; i++) {
       const element = data.subscriber[i];
       subscriber_email_array.push(element.email);
+      await NotificationAPI.createNewNotification(
+        "Task Status Changed on Subscribed Task!",
+        `Your's subscribed Task: ${
+          data.name
+        } status changed to ${new_status.toUpperCase()}.`,
+        element._id
+      );
     }
 
     let subject = "Task Status Changed on Subscribed Task!";
@@ -297,10 +313,24 @@ const updateTaskStatusLeader = async (_id, status, project_id) => {
       const element = data.members[i];
       element.task_status = status;
       members_email_array.push(element.member.email);
+      await NotificationAPI.createNewNotification(
+        "Task Status Changed!",
+        `The Task: ${
+          data.name
+        } status have been changed to ${status.toUpperCase()}.`,
+        element.member._id
+      );
     }
     for (let i = 0; i < data.subscriber.length; i++) {
       const element = data.subscriber[i];
       subscriber_email_array.push(element.email);
+      await NotificationAPI.createNewNotification(
+        "Task Status Changed On Subscribed Task!",
+        `Your's subscribed Task: ${
+          data.name
+        } status have been changed to ${status.toUpperCase()}`,
+        element._id
+      );
     }
     //Setting new status for task and as well as for its members
     const updatedResult = await Task.updateOne(
@@ -727,6 +757,11 @@ const notifyUsersWhoseTasksDueDateInOneHour = async () => {
           "Task Due In One Hour!",
           `The Task: ${task.name} is due with in One Hour`
         );
+        await NotificationAPI.createNewNotification(
+          "Task Due In One Hour!",
+          `The Task: ${task.name} is due with in One Hour`,
+          member.member._id
+        );
       }
     }
   } catch (e) {
@@ -765,6 +800,11 @@ const notifyUsersWhoseTasksDueDateInSixHour = async () => {
           [member.member.email],
           "Task Due In Six Hours!",
           `The Task: ${task.name} is due with in Six Hours`
+        );
+        await NotificationAPI.createNewNotification(
+          "Task Due In Six Hours!",
+          `The Task: ${task.name} is due with in Six Hours`,
+          member.member._id
         );
       }
     }
@@ -805,6 +845,11 @@ const notifyUsersWhoseTasksDueDateInTwelveHour = async () => {
           "Task Due In Twelve Hours!",
           `The Task: ${task.name} is due with in Twelve Hours`
         );
+        await NotificationAPI.createNewNotification(
+          "Task Due In Tweleve Hours!",
+          `The Task: ${task.name} is due with in Tweleve Hours`,
+          member.member._id
+        );
       }
     }
   } catch (e) {
@@ -844,6 +889,11 @@ const notifyUsersWhoseTasksDueDateInOneDay = async () => {
           "Task Due In Twenty Four Hours!",
           `The Task: ${task.name} is due with in Twenty Four Hours`
         );
+        await NotificationAPI.createNewNotification(
+          "Task Due In Twenty Four Hours!",
+          `The Task: ${task.name} is due with in Twenty Four Hours`,
+          member.member._id
+        );
       }
     }
   } catch (e) {
@@ -878,6 +928,11 @@ const addSubscriber = async (_id, member_id, project_id) => {
         `You have been subscribed to task: ${res.name}.`
       );
     }
+    await NotificationAPI.createNewNotification(
+      "You Subscribed!",
+      `You have been subscribed to Task: ${res.name}`,
+      member_id
+    );
     const result = await Task.updateOne({ _id }, { subscriber });
     return result;
   } catch (e) {
@@ -901,6 +956,11 @@ const removeSubscriber = async (_id, member_id, project_id) => {
         [member.email],
         "You Unsubscribed!",
         `You have been unsubscribed to task: ${res.name}.`
+      );
+      await NotificationAPI.createNewNotification(
+        "You Unsubscribed!",
+        `You have been unsubscribed to Task: ${res.name}`,
+        member_id
       );
     }
     const result = await Task.updateOne({ _id }, { subscriber });
@@ -949,6 +1009,10 @@ const getTasksInHierarchy = async (project_id) => {
     return e;
   }
 };
+
+// const sendNotification = (socket) => {
+//   socket.emit("fromTaskAPI", { data: "Task" });
+// };
 
 module.exports = {
   createNewTask,

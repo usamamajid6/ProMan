@@ -1,7 +1,8 @@
 const Project = require("../Schemas/ProjectSchema");
 const UserAPI = require("./UserAPI");
 const TimelineAPI = require("./TimelineAPI");
-
+const NotificationAPI = require("./NotificationAPI");
+const Emailer = require("../Email");
 const getLastId = async () => {
   try {
     const result = await Project.find().sort({ _id: -1 }).limit(1);
@@ -217,6 +218,23 @@ const addMember = async (_id, member_id) => {
     const member = await UserAPI.getUser(member_id);
     let content = "New member " + member.name + " added to team.";
     await TimelineAPI.createNewTimeline(content, "green", _id);
+    let data = await Project.findOne({ _id });
+    let subject = "You added to Project!";
+    let message =
+      "<div> <b> AoA </b> </div>,<div> In Project:<b> " +
+      data.name +
+      "</b> you are added as a memeber </div> <div> Further details are: <b> " +
+      data.description +
+      "</b> .</div> <div> This Project's Start Date is: <b>" +
+      data.start_date +
+      "</b>.</div><div> This Project's End Date (Estimated) is: <b>" +
+      data.end_date;
+    Emailer.sendMail([member.email], subject, message);
+    await NotificationAPI.createNewNotification(
+      "Added to Project!",
+      `You are added to Project:${data.name} as a member.`,
+      member_id
+    );
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
@@ -246,6 +264,30 @@ const addMembers = async (_id, member_id_array) => {
     }
 
     const result = await Project.updateOne({ _id }, { members });
+
+    let data = await Project.findOne({ _id }).populate("members.member");
+    let members_email_array = [];
+    for (let i = 0; i < data.members.length; i++) {
+      const element = data.members[i];
+      members_email_array.push(element.member.email);
+      await NotificationAPI.createNewNotification(
+        "Added to Project!",
+        `You are added to Project:${data.name} as a member.`,
+        element.member._id
+      );
+    }
+    let subject = "You added to New Project!";
+    let message =
+      "<div> <b> AoA </b> </div>,<div> A new Project:<b> " +
+      data.name +
+      "</b> is created and you are added as a memeber </div> <div> Further details are: <b> " +
+      data.description +
+      "</b> .</div> <div> This Project's Start Date is: <b>" +
+      data.start_date +
+      "</b>.</div><div> This Project's End Date (Estimated) is: <b>" +
+      data.end_date;
+    Emailer.sendMail(members_email_array, subject, message);
+
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
