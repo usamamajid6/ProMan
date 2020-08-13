@@ -13,7 +13,7 @@ const getLastId = async () => {
   }
 };
 
-const createNewNotification = async (name, description, member_id) => {
+const createNewNotification = async (name, description, member_id, p) => {
   try {
     let n = 1;
     let _id = await getLastId();

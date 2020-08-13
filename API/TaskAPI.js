@@ -6,8 +6,6 @@ const Project = require("../API/ProjectAPI");
 const Emailer = require("../Email");
 const TimelineAPI = require("./TimelineAPI");
 const NotificationAPI = require("./NotificationAPI");
-const emitter = require("events").EventEmitter;
-const em = new emitter();
 
 const getLastId = async () => {
   try {
@@ -48,7 +46,6 @@ const createNewTask = async (
     let _id = await getLastId();
     _id = parseInt(_id);
     ++_id;
-    // let _id=1;
     const task = new Task({
       _id,
       name,
@@ -440,12 +437,92 @@ const addSubTask = async (_id, subtask_id) => {
   }
 };
 
-const addMember = async (_id, member_id) => {
+const addMember = async (_id, member_id, project_id) => {
   try {
-    const result = await Task.updateOne(
-      { _id },
-      { $push: { members: member_id } }
+    let data = await Task.findOne({ _id });
+    let member_array = data.members;
+    let member = {
+      _id: member_id,
+      member: member_id,
+      task_status: "in-progress",
+      last_updated_on: new Date(),
+    };
+    member_array.push(member);
+    result = await Task.updateOne({ _id }, { members: member_array });
+    await removeSubscriber(_id, member_id, project_id);
+    data = await Task.findOne({ _id })
+      .populate("members.member")
+      .populate("subscriber");
+    await NotificationAPI.createNewNotification(
+      "Added to Existing Task!",
+      `You have been added to task: : ${data.name}`,
+      member_id
     );
+    let new_member_data = await UserAPI.getUser(member_id);
+    let members_email_array = [];
+    for (let i = 0; i < data.members.length - 1; i++) {
+      const element = data.members[i];
+      members_email_array.push(element.member.email);
+      await NotificationAPI.createNewNotification(
+        "New Member Existing Added!",
+        `A new Member ${new_member_data.name} added to exiting task: : ${data.name}`,
+        element.member._id
+      );
+    }
+
+    let subject = "New Member Added To Existing Task!";
+    let message =
+      `A new Member ${new_member_data.name} added to task: : ${data.name}` +
+      ", further details are: " +
+      data.description +
+      ". This task's due date is: " +
+      data.due_date +
+      ".";
+    Emailer.sendMail(members_email_array, subject, message);
+
+    subject = "Added To Existing Task!";
+    message =
+      "AoA, An existing task has been assigned to you, task name is: " +
+      data.name +
+      ", further details are: " +
+      data.description +
+      ". This task's due date is: " +
+      data.due_date +
+      ".";
+    Emailer.sendMail([new_member_data.email], subject, message);
+
+    // Add Timeline
+    let content =
+      "In Task " +
+      data.name +
+      " a new member added, member name is: " +
+      new_member_data.name;
+    await TimelineAPI.createNewTimeline(content, "blue", project_id);
+
+    // Send To Subscribers
+
+    let subscriber_email_array = [];
+    for (let i = 0; i < data.subscriber.length; i++) {
+      const element = data.subscriber[i];
+      subscriber_email_array.push(element.email);
+      await NotificationAPI.createNewNotification(
+        "New Member Added on Subscribed Task!",
+        `Your's subscribed Task: ${data.name} have a new member, member name is: ${new_member_data.name}`,
+        element._id
+      );
+    }
+
+    subject = "New Member Added on Subscribed Task!";
+    message =
+      "AoA, Yours subscribed Task: " +
+      data.name +
+      "'s have a new member: " +
+      new_member_data.name +
+      ".";
+    if (subscriber_email_array.length !== 0) {
+      Emailer.sendMail(subscriber_email_array, subject, message);
+    }
+
     return result;
   } catch (e) {
     console.log("Problem in addMember", e);
@@ -1010,6 +1087,89 @@ const getTasksInHierarchy = async (project_id) => {
   }
 };
 
+const updateTask = async (
+  _id,
+  name,
+  description,
+  due_date,
+  what_changes,
+  project_id
+) => {
+  try {
+    let before_update_task = await Task.findOne({ _id });
+    const result = await Task.updateOne(
+      { _id },
+      {
+        name,
+        description,
+        due_date,
+      }
+    );
+
+    let master_head = "";
+    let master_content = "";
+
+    if (what_changes === "name") {
+      master_head = "Task Name Changed!";
+      master_content = `Task's name chnaged to "${name}" from "${before_update_task.name}".`;
+    }
+    if (what_changes === "description") {
+      master_head = "Task Description Changed!";
+      master_content = `Task's Description chnaged to "${description}" from "${before_update_task.description}".`;
+    }
+    if (what_changes === "due_date") {
+      master_head = "Task Due Date Changed!";
+      master_content = `Task's name chnaged to "${due_date}" from "${before_update_task.due_date}".`;
+    }
+    data = await Task.findOne({ _id })
+      .populate("members.member")
+      .populate("subscriber");
+
+    let members_email_array = [];
+    for (let i = 0; i < data.members.length; i++) {
+      const element = data.members[i];
+      members_email_array.push(element.member.email);
+      await NotificationAPI.createNewNotification(
+        master_head,
+        master_content,
+        element.member._id
+      );
+    }
+
+    let subject = master_head;
+    let message = "AoA   " + master_content;
+    Emailer.sendMail(members_email_array, subject, message);
+
+    // Add Timeline
+    let content = master_content;
+    await TimelineAPI.createNewTimeline(content, "blue", project_id);
+
+    // Send To Subscribers
+
+    let subscriber_email_array = [];
+    for (let i = 0; i < data.subscriber.length; i++) {
+      const element = data.subscriber[i];
+      subscriber_email_array.push(element.email);
+      await NotificationAPI.createNewNotification(
+        master_head + " on Subscribed Task!",
+        master_content,
+        element._id
+      );
+    }
+
+    subject = master_head + " on Subscribed Task!";
+    message = "AoA, Yours subscribed Task: " + master_content;
+    if (subscriber_email_array.length !== 0) {
+      Emailer.sendMail(subscriber_email_array, subject, message);
+    }
+
+    return result;
+  } catch (e) {
+    console.log("Problem In updateTask Method!", e);
+    return e;
+  }
+};
+
 // const sendNotification = (socket) => {
 //   socket.emit("fromTaskAPI", { data: "Task" });
 // };
@@ -1034,4 +1194,5 @@ module.exports = {
   addSubscriber,
   removeSubscriber,
   getTasksInHierarchy,
+  updateTask,
 };

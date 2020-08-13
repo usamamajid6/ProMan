@@ -25,9 +25,9 @@ const TaskAPI = require("./API/TaskAPI");
 
 app.use(express.json());
 app.use(cors());
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms")
-);
+// app.use(
+//   morgan(":method :url :status :res[content-length] - :response-time ms")
+// );
 app.use("/AttachmentUploads", express.static("AttachmentUploads"));
 app.use("/DPUploads", express.static("DPUploads"));
 connectToDB();
@@ -45,9 +45,6 @@ app.use(Chat);
 app.use(Notification);
 
 app.get("/", (req, res) => {
-  console.log("====================================");
-  console.log(req.body);
-  console.log("====================================");
   res.json({
     status: true,
     message: "Last Commit At 09:34 PM At August 04",
@@ -57,7 +54,7 @@ app.get("/", (req, res) => {
 server.listen(PORT, (e) => {
   console.log(`Server started at Port # ${PORT}`);
 });
-console.log(new Date());
+// console.log(new Date());
 
 // Send Notofication For Task Due in 30 Mins, 6 Hours, 12 Hours, 1 Day Via E-mail
 

@@ -214,4 +214,78 @@ app.post("/removeSubscriberToTask", async (req, res) => {
   }
 });
 
+app.put("/updateTask", async (req, res) => {
+  try {
+    let {
+      _id,
+      name,
+      description,
+      due_date,
+      what_changes,
+      project_id,
+    } = req.body;
+    let result = await Task.updateTask(
+      _id,
+      name,
+      description,
+      due_date,
+      what_changes,
+      project_id
+    );
+    if (result) {
+      //Task Status Updated Successfully
+      result = await Task.getTaskById(req.body._id);
+      res.json({
+        status: "Success",
+        message: "Task Updated Succesfully!",
+        data: result,
+      });
+    } else {
+      //Task Updated Unsuccessful
+      res.json({
+        status: "Failed",
+        message: "Some problem occur!",
+        data: result,
+      });
+    }
+  } catch (e) {
+    console.log("Problem in /updateTask Router", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem in /updateTask Router!",
+      data: e,
+    });
+  }
+});
+
+app.put("/addMemberToTask", async (req, res) => {
+  try {
+    let { _id, member_id, project_id } = req.body;
+    let result = await Task.addMember(_id, member_id, project_id);
+    if (result) {
+      //Member added to Task Successfully
+      result = await Task.getTaskById(req.body._id);
+      res.json({
+        status: "Success",
+        message: "Member added to Task Successfully!",
+        data: result,
+      });
+    } else {
+      //Task Updated Unsuccessful
+      res.json({
+        status: "Failed",
+        message: "Some problem occur!",
+        data: result,
+      });
+    }
+  } catch (e) {
+    console.log("Problem in /addMemberToTask Router", e);
+    res.json({
+      status: "Failed",
+      message: "Some Problem in /addMemberToTask Router!",
+      data: e,
+    });
+  }
+});
+
 module.exports = app;
