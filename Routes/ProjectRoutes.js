@@ -6,6 +6,7 @@ const User = require("../API/UserAPI");
 const TaskList = require("../API/TaskListAPI");
 const Task = require("../API/TaskAPI");
 const Chat = require("../API/ChatAPI");
+const TaskAPI = require("../API/TaskAPI");
 // app.use(express.json());
 
 app.post("/createNewProject", async (req, res) => {
@@ -121,6 +122,11 @@ app.post("/getProjectById", async (req, res) => {
     if (result) {
       //Get Project Successfully
       const taskList = await TaskList.getTaskListsByProjectId(result._id);
+      const userTasks = await TaskAPI.getTaskById(req.body.user_id);
+      taskList.push({
+        tasks: userTasks,
+        name: "Your Tasks",
+      });
       // result.data.taskList = taskList;
       res.json({
         status: "Success",
@@ -472,6 +478,11 @@ app.post("/getProjectData", async (req, res) => {
       );
 
       result.taskList = taskList;
+      const userTasks = await TaskAPI.getTasksByUserId(req.body.user_id);
+      taskList.unshift({
+        tasks: userTasks,
+        name: "Your Tasks",
+      });
       res.json({
         status: "Success",
         message: "Get Project Succesfully!",

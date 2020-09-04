@@ -53,7 +53,7 @@ const returnMailOptions = (receivers_array, subject, message) => {
   }
   to = to.slice(0, to.length - 1);
   const mailOptions = {
-    from: "mailuseformailtester@gmail.com",
+    from: "ProMan <mailuseformailtester@gmail.com>",
     to,
     subject,
     html: message,

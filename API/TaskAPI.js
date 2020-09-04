@@ -148,6 +148,48 @@ const getTaskById = async (_id) => {
   }
 };
 
+const getTasksByUserId = async (user_id) => {
+  try {
+    const task = Task.find({
+      members: { $elemMatch: { _id: user_id } },
+    }).populate([
+      {
+        path: "members.member",
+        select: { name: 1 },
+      },
+      {
+        path: "comments",
+        populate: {
+          path: "member",
+          select: { name: 1, dp: 1 },
+        },
+      },
+      {
+        path: "pre_req",
+        select: { name: 1, status: 1 },
+      },
+      ,
+      {
+        path: "task_list",
+        select: { name: 1 },
+      },
+      {
+        path: "attachments",
+      },
+      {
+        path: "sub_tasks",
+      },
+      {
+        path: "subscriber",
+      },
+    ]);
+    return task;
+  } catch (e) {
+    console.log("Problem in getTasksById.", e);
+    return e;
+  }
+};
+
 const updateTaskStatus = async (_id, status, member_id, project_id) => {
   try {
     const result = await Task.findOne({ _id }).populate("subscriber"); // Get Task Data
@@ -1177,6 +1219,7 @@ const updateTask = async (
 module.exports = {
   createNewTask,
   getTaskById,
+  getTasksByUserId,
   updateTaskStatus,
   updateTaskStatusLeader,
   addAttachment,
