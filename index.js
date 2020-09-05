@@ -47,7 +47,7 @@ app.use(Notification);
 app.get("/", (req, res) => {
   res.json({
     status: true,
-    message: "Last Commit At 10:09 AM At August 16",
+    message: "Last Commit At 10:37 PM At September 05",
   });
 });
 

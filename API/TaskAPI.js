@@ -148,10 +148,12 @@ const getTaskById = async (_id) => {
   }
 };
 
-const getTasksByUserId = async (user_id) => {
+const getTasksByUserId = async (user_id, project_id) => {
   try {
     const task = Task.find({
       members: { $elemMatch: { _id: user_id } },
+      status: { $in: ["in-progress", "pending"] },
+      project: project_id,
     }).populate([
       {
         path: "members.member",

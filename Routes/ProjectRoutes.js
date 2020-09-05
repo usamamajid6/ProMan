@@ -478,7 +478,10 @@ app.post("/getProjectData", async (req, res) => {
       );
 
       result.taskList = taskList;
-      const userTasks = await TaskAPI.getTasksByUserId(req.body.user_id);
+      const userTasks = await TaskAPI.getTasksByUserId(
+        req.body.user_id,
+        result._id
+      );
       taskList.unshift({
         tasks: userTasks,
         name: "Your Tasks",
